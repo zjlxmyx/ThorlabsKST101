@@ -26,3 +26,4 @@ e = Y_axis.start_polling(200)
 
 
 z = 1
+-m PyQt5.uic.pyuic $FileName$ -o ui_$FileNameWithoutExtension$.py -x
