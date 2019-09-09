@@ -6,17 +6,11 @@ from ThorlabsKST101 import *
 
 class GUIMainWindow(Ui_MainWindow):
     def __init__(self):
-
         super(GUIMainWindow, self).__init__()
         self.setupUi(MainWindow)
 
         self.init_motor()
         self.init_UI()
-
-
-
-
-
 
     def init_motor(self):
         global Y_axis
@@ -30,9 +24,18 @@ class GUIMainWindow(Ui_MainWindow):
         Y_axis.home()
 
     def init_UI(self):
+
         self.up_button.setText('up')
+        # button pressed function ------ motor move with velocity
         self.up_button.pressed.connect(lambda: Y_axis.move_at_velocity(1))
+        # button released function ----- motor stopped
         self.up_button.released.connect(Y_axis.stop_profiled)
+
+        self.down_button.setText('down')
+        # button pressed function ------ motor move with velocity
+        self.down_button.pressed.connect(lambda: Y_axis.move_at_velocity(2))
+        # button released function ----- motor stopped
+        self.down_button.released.connect(Y_axis.stop_profiled)
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
