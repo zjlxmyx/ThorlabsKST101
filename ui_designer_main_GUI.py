@@ -26,6 +26,15 @@ class Ui_MainWindow(object):
         self.right_button = QtWidgets.QPushButton(self.centralwidget)
         self.right_button.setGeometry(QtCore.QRect(460, 360, 75, 75))
         self.right_button.setObjectName("right_button")
+        self.y_label = QtWidgets.QLabel(self.centralwidget)
+        self.y_label.setGeometry(QtCore.QRect(130, 120, 26, 19))
+        self.y_label.setObjectName("y_label")
+        self.x_label = QtWidgets.QLabel(self.centralwidget)
+        self.x_label.setGeometry(QtCore.QRect(130, 100, 26, 19))
+        self.x_label.setObjectName("x_label")
+        self.z_label = QtWidgets.QLabel(self.centralwidget)
+        self.z_label.setGeometry(QtCore.QRect(130, 140, 26, 19))
+        self.z_label.setObjectName("z_label")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
@@ -41,10 +50,13 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Motor controller 1.0"))
-        self.up_button.setText(_translate("MainWindow", "PushButton"))
-        self.left_button.setText(_translate("MainWindow", "PushButton"))
-        self.down_button.setText(_translate("MainWindow", "PushButton"))
-        self.right_button.setText(_translate("MainWindow", "PushButton"))
+        self.up_button.setText(_translate("MainWindow", "Up"))
+        self.left_button.setText(_translate("MainWindow", "Left"))
+        self.down_button.setText(_translate("MainWindow", "Down"))
+        self.right_button.setText(_translate("MainWindow", "Right"))
+        self.y_label.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:12pt;\">null</span></p></body></html>"))
+        self.x_label.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:12pt;\">null</span></p></body></html>"))
+        self.z_label.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:12pt;\">null</span></p></body></html>"))
 
 
 if __name__ == "__main__":

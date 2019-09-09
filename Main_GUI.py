@@ -25,17 +25,25 @@ class GUIMainWindow(Ui_MainWindow):
 
     def init_UI(self):
 
-        self.up_button.setText('up')
         # button pressed function ------ motor move with velocity
         self.up_button.pressed.connect(lambda: Y_axis.move_at_velocity(1))
         # button released function ----- motor stopped
         self.up_button.released.connect(Y_axis.stop_profiled)
 
-        self.down_button.setText('down')
-        # button pressed function ------ motor move with velocity
         self.down_button.pressed.connect(lambda: Y_axis.move_at_velocity(2))
-        # button released function ----- motor stopped
         self.down_button.released.connect(Y_axis.stop_profiled)
+
+        self.display_loop()
+
+
+
+    def display_loop(self):
+        while 1:
+            time.sleep(0.1)
+            YPosition = Y_axis.get_position()
+            self.y_label.setText(str(YPosition))
+
+
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
