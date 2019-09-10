@@ -33,15 +33,20 @@ class GUIMainWindow(Ui_MainWindow):
         self.down_button.pressed.connect(lambda: Y_axis.move_at_velocity(2))
         self.down_button.released.connect(Y_axis.stop_profiled)
 
-        self.display_loop()
+        DisplayLoop = Thread
+        DisplayLoop.start()
 
 
+class Thread(QtCore.QThread):
 
-    def display_loop(self):
-        while 1:
-            time.sleep(0.1)
-            YPosition = Y_axis.get_position()
-            self.y_label.setText(str(YPosition))
+    def __init__(self):
+        super().__init__()
+
+    def run(self):
+        time.sleep(0.1)
+        YPosition = Y_axis.get_position()
+        self.y_label.setText(str(YPosition))
+
 
 
 
