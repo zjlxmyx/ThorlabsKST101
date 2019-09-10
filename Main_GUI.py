@@ -13,7 +13,9 @@ class GUIMainWindow(Ui_MainWindow):
         self.init_motor()
         self.init_UI()
 
+        # Multitasking for position from motors
         self.PositionThread = Thread()
+        # Connecting the signal of new Thread to position refresh function
         self.PositionThread.PositionSignal.connect(self.position_refresh)
         self.PositionThread.start()
 
@@ -43,12 +45,15 @@ class GUIMainWindow(Ui_MainWindow):
         self.y_label.setText(str(YPosition))
 
 
+# create the Thread Class
 class Thread(QtCore.QThread):
+    # define a new Signal without value
     PositionSignal = QtCore.pyqtSignal()
 
     def __init__(self):
         super().__init__()
 
+    # emit the signal every 0.2s
     def run(self):
         while True:
             time.sleep(0.2)
