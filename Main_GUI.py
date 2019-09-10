@@ -5,12 +5,17 @@ from ThorlabsKST101 import *
 
 
 class GUIMainWindow(Ui_MainWindow):
+
     def __init__(self):
         super(GUIMainWindow, self).__init__()
         self.setupUi(MainWindow)
 
         self.init_motor()
         self.init_UI()
+
+        self.PositionThread = Thread()
+        self.PositionThread.PositionSignal.connect(self.position_refresh)
+        self.PositionThread.start()
 
     def init_motor(self):
         global Y_axis
@@ -33,19 +38,24 @@ class GUIMainWindow(Ui_MainWindow):
         self.down_button.pressed.connect(lambda: Y_axis.move_at_velocity(2))
         self.down_button.released.connect(Y_axis.stop_profiled)
 
-        DisplayLoop = Thread
-        DisplayLoop.start()
+    def position_refresh(self):
+        YPosition = Y_axis.get_position()
+        self.y_label.setText(str(YPosition))
 
 
 class Thread(QtCore.QThread):
+    PositionSignal = QtCore.pyqtSignal()
 
     def __init__(self):
         super().__init__()
 
     def run(self):
-        time.sleep(0.1)
-        YPosition = Y_axis.get_position()
-        self.y_label.setText(str(YPosition))
+        while True:
+            time.sleep(0.2)
+            self.PositionSignal.emit()
+
+
+
 
 
 
