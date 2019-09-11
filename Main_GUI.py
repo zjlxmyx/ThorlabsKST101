@@ -67,6 +67,8 @@ class GUIMainWindow(Ui_MainWindow):
         self.radioButton_slow.clicked.connect(lambda: X_axis.set_vel_params(10000, 1000000))
         self.radioButton_slow.clicked.connect(lambda: Y_axis.set_vel_params(10000, 1000000))
 
+        self.button_MoveTo.clicked.connect(self.move_to)
+
     # function of showing position of motors
     def position_refresh(self):
         XPosition = X_axis.get_position()
@@ -74,6 +76,13 @@ class GUIMainWindow(Ui_MainWindow):
         YPosition = Y_axis.get_position()
         self.label_y.setText(str(YPosition))
 
+    # function of move to button
+    def move_to(self):
+        if self.checkBox_xMove.isChecked():
+            X_axis.move_to_position(int(self.lineEdit_xMoveTo.text()))
+
+        if self.checkBox_yMove.isChecked():
+            Y_axis.move_to_position(int(self.lineEdit_yMoveTo.text()))
 
 # create the Thread Class
 class Thread(QtCore.QThread):
