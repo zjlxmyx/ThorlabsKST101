@@ -44,7 +44,6 @@ class GUIMainWindow(Ui_MainWindow):
         X_axis.move_to_position(3700000)
         Y_axis.move_to_position(3700000)
 
-
     def init_UI(self):
 
         # button function ------ motor move with velocity, and stop mode
@@ -59,8 +58,6 @@ class GUIMainWindow(Ui_MainWindow):
 
         self.button_S.pressed.connect(lambda: Y_axis.move_at_velocity(2))
         self.button_S.released.connect(Y_axis.stop_profiled)
-
-
 
         # change the velocity of moving
         self.radioButton_fast.clicked.connect(lambda: X_axis.set_vel_params(50000, 15000000))
