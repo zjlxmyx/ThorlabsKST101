@@ -10,8 +10,8 @@ class GUIMainWindow(Ui_MainWindow):
         super(GUIMainWindow, self).__init__()
         self.setupUi(MainWindow)
 
-        self.init_motor()
         self.init_UI()
+        self.init_motor()
 
         # Multitasking for position from motors
         self.PositionThread = Thread()
@@ -20,29 +20,62 @@ class GUIMainWindow(Ui_MainWindow):
         self.PositionThread.start()
 
     def init_motor(self):
-        global Y_axis
+        global X_axis, Y_axis
+        X_axis = Motor('26000284')
+        Y_axis.connect()
+
         Y_axis = Motor('26000306')
         Y_axis.connect()
+
         time.sleep(0.1)
+        X_axis.start_polling(200)
         Y_axis.start_polling(200)
+
         time.sleep(0.1)
-        Y_axis.set_vel_params(10000, 1000000)
+        X_axis.set_vel_params(500000, 15000000)
+        Y_axis.set_vel_params(500000, 15000000)
+
         time.sleep(0.1)
+        X_axis.home()
         Y_axis.home()
+
+        while Y_axis.is_moving() or X_axis.is_moving():
+            time.sleep(1)
+        X_axis.move_to_position(3700000)
+        Y_axis.move_to_position(3700000)
+
 
     def init_UI(self):
 
-        # button pressed function ------ motor move with velocity
-        self.up_button.pressed.connect(lambda: Y_axis.move_at_velocity(1))
-        # button released function ----- motor stopped
-        self.up_button.released.connect(Y_axis.stop_profiled)
+        # button function ------ motor move with velocity, and stop mode
+        self.button_A.pressed.connect(lambda: X_axis.move_at_velocity(2))
+        self.button_A.released.connect(X_axis.stop_profiled)
 
-        self.down_button.pressed.connect(lambda: Y_axis.move_at_velocity(2))
-        self.down_button.released.connect(Y_axis.stop_profiled)
+        self.button_D.pressed.connect(lambda: X_axis.move_at_velocity(1))
+        self.button_D.released.connect(X_axis.stop_profiled)
 
+        self.button_W.pressed.connect(lambda: Y_axis.move_at_velocity(1))
+        self.button_W.released.connect(Y_axis.stop_profiled)
+
+        self.button_S.pressed.connect(lambda: Y_axis.move_at_velocity(2))
+        self.button_S.released.connect(Y_axis.stop_profiled)
+
+
+
+        # change the velocity of moving
+        self.radioButton_fast.clicked.connect(lambda: X_axis.set_vel_params(50000, 15000000))
+        self.radioButton_fast.clicked.connect(lambda: Y_axis.set_vel_params(50000, 15000000))
+        self.radioButton_normal.clicked.connect(lambda: X_axis.set_vel_params(30000, 8000000))
+        self.radioButton_normal.clicked.connect(lambda: Y_axis.set_vel_params(30000, 8000000))
+        self.radioButton_slow.clicked.connect(lambda: X_axis.set_vel_params(10000, 1000000))
+        self.radioButton_slow.clicked.connect(lambda: Y_axis.set_vel_params(10000, 1000000))
+
+    # function of showing position of motors
     def position_refresh(self):
+        XPosition = X_axis.get_position()
+        self.label_x.setText(str(XPosition))
         YPosition = Y_axis.get_position()
-        self.y_label.setText(str(YPosition))
+        self.label_y.setText(str(YPosition))
 
 
 # create the Thread Class
