@@ -67,6 +67,7 @@ class GUIMainWindow(Ui_MainWindow):
         self.radioButton_slow.clicked.connect(lambda: X_axis.set_vel_params(10000, 1000000))
         self.radioButton_slow.clicked.connect(lambda: Y_axis.set_vel_params(10000, 1000000))
 
+        # Button of Move to
         self.button_MoveTo.clicked.connect(self.move_to)
 
     # function of showing position of motors
