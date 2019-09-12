@@ -11,8 +11,8 @@ class GUIMainWindow(Ui_MainWindow):
         super(GUIMainWindow, self).__init__()
         self.setupUi(MainWindow)
 
-        self.init_UI()
         self.init_motor()
+        self.init_UI()
 
         # Multitasking for position from motors
         self.PositionThread = Thread()
