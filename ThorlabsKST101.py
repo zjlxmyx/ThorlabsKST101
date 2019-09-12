@@ -1,6 +1,6 @@
 import ctypes
 import os
-import time
+from ctypes import wintypes
 
 os.environ['path'] += ';C:\Program Files\Thorlabs\Kinesis'
 lib = ctypes.cdll.LoadLibrary('Thorlabs.MotionControl.KCube.StepperMotor.dll')

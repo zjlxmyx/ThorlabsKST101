@@ -1,4 +1,5 @@
 import sys
+import time
 from ui_designer_main_GUI import Ui_MainWindow
 from PyQt5 import QtCore, QtGui, QtWidgets
 from ThorlabsKST101 import *
