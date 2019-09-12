@@ -86,6 +86,25 @@ class GUIMainWindow(Ui_MainWindow):
         if self.checkBox_yMove.isChecked():
             Y_axis.move_to_position(int(self.lineEdit_yMoveTo.text()))
 
+    def keyPressEvent(self, event):
+        # press W
+        if (event.key() == QtCore.Qt.Key_W) and (not event.isAutoRepeat()):
+            Y_axis.move_at_velocity(1)
+
+        # press S
+        elif (event.key() == QtCore.Qt.Key_S) and (not event.isAutoRepeat()):
+            Y_axis.move_at_velocity(2)
+
+    def keyReleaseEvent(self, event):
+        # release W
+        if (event.key() == QtCore.Qt.Key_W) and (not event.isAutoRepeat()):
+            Y_axis.stop_profiled()
+
+        # release S
+        elif (event.key() == QtCore.Qt.Key_S) and (not event.isAutoRepeat()):
+            Y_axis.stop_profiled()
+
+
 # create the Thread Class
 class Thread(QtCore.QThread):
     # define a new Signal without value
