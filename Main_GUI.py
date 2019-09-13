@@ -15,7 +15,6 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.init_UI()
         self.init_motor()
 
-
         # Multitasking for position from motors
         self.PositionThread = Thread()
         # Connecting the signal of new Thread to position refresh function
@@ -23,16 +22,20 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.PositionThread.start()
 
     def init_motor(self):
-        global X_axis, Y_axis
+        global X_axis, Y_axis, Z_axis
         X_axis = Motor('26000284')
         X_axis.connect()
 
         Y_axis = Motor('26000306')
         Y_axis.connect()
 
+        Z_axis = Motor('26000236')
+        Z_axis.connect()
+
         time.sleep(0.1)
         X_axis.start_polling(200)
         Y_axis.start_polling(200)
+        Z_axis.start_polling(200)
 
         time.sleep(0.1)
         X_axis.set_vel_params(500000, 50000000)
@@ -41,6 +44,7 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         time.sleep(0.1)
         X_axis.home()
         Y_axis.home()
+
 
         time.sleep(0.5)
         while Y_axis.is_moving() or X_axis.is_moving():
@@ -67,6 +71,12 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.button_S.pressed.connect(lambda: Y_axis.move_at_velocity(2))
         self.button_S.released.connect(lambda: Y_axis.stop_profiled())
 
+        self.button_R.pressed.connect(lambda: Z_axis.move_at_velocity(1))
+        self.button_R.released.connect(lambda: Z_axis.stop_profiled())
+
+        self.button_F.pressed.connect(lambda: Z_axis.move_at_velocity(2))
+        self.button_F.released.connect(lambda: Z_axis.stop_profiled())
+
         # change the velocity of moving
         self.radioButton_fast.clicked.connect(lambda: X_axis.set_vel_params(50000, 15000000))
         self.radioButton_fast.clicked.connect(lambda: Y_axis.set_vel_params(50000, 15000000))
@@ -84,6 +94,8 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.label_x.setText(str(XPosition))
         YPosition = Y_axis.get_position()
         self.label_y.setText(str(YPosition))
+        ZPosition = Z_axis.get_position()
+        self.label_z.setText(str(ZPosition))
 
     # function of move to button
     def move_to(self):
@@ -93,6 +105,10 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         if self.checkBox_yMove.isChecked():
             Y_axis.move_to_position(int(self.lineEdit_yMoveTo.text()))
 
+        if self.checkBox_zMove.isChecked():
+            Z_axis.move_to_position(int(self.lineEdit_zMoveTo.text()))
+
+    # Keyboard motors controller
     def keyPressEvent(self, event):
         # press W
         if (event.key() == QtCore.Qt.Key_W) and (not event.isAutoRepeat()):
