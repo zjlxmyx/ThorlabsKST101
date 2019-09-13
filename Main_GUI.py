@@ -38,12 +38,14 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         Z_axis.start_polling(200)
 
         time.sleep(0.1)
-        X_axis.set_vel_params(500000, 50000000)
-        Y_axis.set_vel_params(500000, 50000000)
+        X_axis.set_vel_params(500000, 30000000)
+        Y_axis.set_vel_params(500000, 30000000)
+        Z_axis.set_vel_params(500000, 30000000)
 
         time.sleep(0.1)
         X_axis.home()
         Y_axis.home()
+        Z_axis.home()
 
 
         time.sleep(0.5)
@@ -51,10 +53,12 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             time.sleep(1)
         X_axis.move_to_position(3700000)
         Y_axis.move_to_position(3700000)
+        Z_axis.move_to_position(4000000)
 
         time.sleep(0.1)
         X_axis.set_vel_params(500000, 15000000)
         Y_axis.set_vel_params(500000, 15000000)
+        Z_axis.set_vel_params(500000, 15000000)
 
     def init_UI(self):
 
@@ -80,10 +84,13 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         # change the velocity of moving
         self.radioButton_fast.clicked.connect(lambda: X_axis.set_vel_params(50000, 15000000))
         self.radioButton_fast.clicked.connect(lambda: Y_axis.set_vel_params(50000, 15000000))
+        self.radioButton_fast.clicked.connect(lambda: Z_axis.set_vel_params(50000, 15000000))
         self.radioButton_normal.clicked.connect(lambda: X_axis.set_vel_params(30000, 8000000))
         self.radioButton_normal.clicked.connect(lambda: Y_axis.set_vel_params(30000, 8000000))
+        self.radioButton_normal.clicked.connect(lambda: Z_axis.set_vel_params(30000, 5000000))
         self.radioButton_slow.clicked.connect(lambda: X_axis.set_vel_params(10000, 1000000))
         self.radioButton_slow.clicked.connect(lambda: Y_axis.set_vel_params(10000, 1000000))
+        self.radioButton_slow.clicked.connect(lambda: Z_axis.set_vel_params(10000, 500000))
 
         # Button of Move to
         self.button_MoveTo.clicked.connect(self.move_to)
