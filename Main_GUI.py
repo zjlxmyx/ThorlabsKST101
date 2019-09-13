@@ -145,15 +145,27 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         elif event.key() == QtCore.Qt.Key_Q:
             if self.radioButton_slow.isChecked():
                 self.radioButton_normal.setChecked(True)
+                self.radioButton_normal.clicked.connect(lambda: X_axis.set_vel_params(30000, 8000000))
+                self.radioButton_normal.clicked.connect(lambda: Y_axis.set_vel_params(30000, 8000000))
+                self.radioButton_normal.clicked.connect(lambda: Z_axis.set_vel_params(30000, 5000000))
             else:
                 self.radioButton_fast.setChecked(True)
+                self.radioButton_fast.clicked.connect(lambda: X_axis.set_vel_params(50000, 15000000))
+                self.radioButton_fast.clicked.connect(lambda: Y_axis.set_vel_params(50000, 15000000))
+                self.radioButton_fast.clicked.connect(lambda: Z_axis.set_vel_params(50000, 15000000))
 
         # press E
         elif event.key() == QtCore.Qt.Key_E:
             if self.radioButton_fast.isChecked():
                 self.radioButton_normal.setChecked(True)
+                self.radioButton_normal.clicked.connect(lambda: X_axis.set_vel_params(30000, 8000000))
+                self.radioButton_normal.clicked.connect(lambda: Y_axis.set_vel_params(30000, 8000000))
+                self.radioButton_normal.clicked.connect(lambda: Z_axis.set_vel_params(30000, 5000000))
             else:
                 self.radioButton_slow.setChecked(True)
+                self.radioButton_slow.clicked.connect(lambda: X_axis.set_vel_params(10000, 1000000))
+                self.radioButton_slow.clicked.connect(lambda: Y_axis.set_vel_params(10000, 1000000))
+                self.radioButton_slow.clicked.connect(lambda: Z_axis.set_vel_params(10000, 500000))
 
 
     def keyReleaseEvent(self, event):
