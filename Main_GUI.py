@@ -5,11 +5,12 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from ThorlabsKST101 import *
 
 
-class GUIMainWindow(Ui_MainWindow):
+class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     def __init__(self):
-        super(GUIMainWindow, self).__init__()
-        self.setupUi(MainWindow)
+        super().__init__()
+        self.setupUi(self)
+        self.show()
 
         self.init_motor()
         self.init_UI()
@@ -23,7 +24,7 @@ class GUIMainWindow(Ui_MainWindow):
     def init_motor(self):
         global X_axis, Y_axis
         X_axis = Motor('26000284')
-        Y_axis.connect()
+        X_axis.connect()
 
         Y_axis = Motor('26000306')
         Y_axis.connect()
@@ -127,7 +128,5 @@ class Thread(QtCore.QThread):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = GUIMainWindow()
-    MainWindow.show()
+    MainWindow = GUIMainWindow()
     sys.exit(app.exec_())
