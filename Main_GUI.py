@@ -133,6 +133,29 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         elif (event.key() == QtCore.Qt.Key_D) and (not event.isAutoRepeat()):
             X_axis.move_at_velocity(2)
 
+        # press R
+        elif (event.key() == QtCore.Qt.Key_R) and (not event.isAutoRepeat()):
+            Z_axis.move_at_velocity(1)
+
+        # press F
+        elif (event.key() == QtCore.Qt.Key_F) and (not event.isAutoRepeat()):
+            Z_axis.move_at_velocity(2)
+
+        # press Q
+        elif event.key() == QtCore.Qt.Key_Q:
+            if self.radioButton_slow.isChecked():
+                self.radioButton_normal.setChecked(True)
+            else:
+                self.radioButton_fast.setChecked(True)
+
+        # press E
+        elif event.key() == QtCore.Qt.Key_E:
+            if self.radioButton_fast.isChecked():
+                self.radioButton_normal.setChecked(True)
+            else:
+                self.radioButton_slow.setChecked(True)
+
+
     def keyReleaseEvent(self, event):
         # release W
         if (event.key() == QtCore.Qt.Key_W) and (not event.isAutoRepeat()):
@@ -150,6 +173,13 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         elif (event.key() == QtCore.Qt.Key_D) and (not event.isAutoRepeat()):
             X_axis.stop_profiled()
 
+        # release R
+        elif (event.key() == QtCore.Qt.Key_R) and (not event.isAutoRepeat()):
+            Z_axis.stop_profiled()
+
+        # release F
+        elif (event.key() == QtCore.Qt.Key_F) and (not event.isAutoRepeat()):
+            Z_axis.stop_profiled()
 
 # create the Thread Class
 class Thread(QtCore.QThread):
