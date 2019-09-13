@@ -12,8 +12,9 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.setupUi(self)
         self.show()
 
-        self.init_motor()
         self.init_UI()
+        self.init_motor()
+
 
         # Multitasking for position from motors
         self.PositionThread = Thread()
@@ -51,16 +52,16 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
         # button function ------ motor move with velocity, and stop mode
         self.button_A.pressed.connect(lambda: X_axis.move_at_velocity(2))
-        self.button_A.released.connect(X_axis.stop_profiled)
+        self.button_A.released.connect(lambda: X_axis.stop_profiled())
 
         self.button_D.pressed.connect(lambda: X_axis.move_at_velocity(1))
-        self.button_D.released.connect(X_axis.stop_profiled)
+        self.button_D.released.connect(lambda: X_axis.stop_profiled())
 
         self.button_W.pressed.connect(lambda: Y_axis.move_at_velocity(1))
-        self.button_W.released.connect(Y_axis.stop_profiled)
+        self.button_W.released.connect(lambda: Y_axis.stop_profiled())
 
         self.button_S.pressed.connect(lambda: Y_axis.move_at_velocity(2))
-        self.button_S.released.connect(Y_axis.stop_profiled)
+        self.button_S.released.connect(lambda: Y_axis.stop_profiled())
 
         # change the velocity of moving
         self.radioButton_fast.clicked.connect(lambda: X_axis.set_vel_params(50000, 15000000))
