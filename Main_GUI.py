@@ -41,6 +41,7 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         X_axis.home()
         Y_axis.home()
 
+        time.sleep(0.2)
         while Y_axis.is_moving() or X_axis.is_moving():
             time.sleep(1)
         X_axis.move_to_position(3700000)
@@ -96,6 +97,14 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         elif (event.key() == QtCore.Qt.Key_S) and (not event.isAutoRepeat()):
             Y_axis.move_at_velocity(2)
 
+        # press A
+        elif (event.key() == QtCore.Qt.Key_A) and (not event.isAutoRepeat()):
+            X_axis.move_at_velocity(1)
+
+        # press D
+        elif (event.key() == QtCore.Qt.Key_D) and (not event.isAutoRepeat()):
+            X_axis.move_at_velocity(2)
+
     def keyReleaseEvent(self, event):
         # release W
         if (event.key() == QtCore.Qt.Key_W) and (not event.isAutoRepeat()):
@@ -104,6 +113,14 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         # release S
         elif (event.key() == QtCore.Qt.Key_S) and (not event.isAutoRepeat()):
             Y_axis.stop_profiled()
+
+        # release A
+        elif (event.key() == QtCore.Qt.Key_A) and (not event.isAutoRepeat()):
+            X_axis.stop_profiled()
+
+        # release D
+        elif (event.key() == QtCore.Qt.Key_D) and (not event.isAutoRepeat()):
+            X_axis.stop_profiled()
 
 
 # create the Thread Class
