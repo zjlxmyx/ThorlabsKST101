@@ -35,18 +35,22 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         Y_axis.start_polling(200)
 
         time.sleep(0.1)
-        X_axis.set_vel_params(500000, 15000000)
-        Y_axis.set_vel_params(500000, 15000000)
+        X_axis.set_vel_params(500000, 50000000)
+        Y_axis.set_vel_params(500000, 50000000)
 
         time.sleep(0.1)
         X_axis.home()
         Y_axis.home()
 
-        time.sleep(0.2)
+        time.sleep(0.5)
         while Y_axis.is_moving() or X_axis.is_moving():
             time.sleep(1)
         X_axis.move_to_position(3700000)
         Y_axis.move_to_position(3700000)
+
+        time.sleep(0.1)
+        X_axis.set_vel_params(500000, 15000000)
+        Y_axis.set_vel_params(500000, 15000000)
 
     def init_UI(self):
 
@@ -137,11 +141,6 @@ class Thread(QtCore.QThread):
         while True:
             time.sleep(0.2)
             self.PositionSignal.emit()
-
-
-
-
-
 
 
 if __name__ == "__main__":
