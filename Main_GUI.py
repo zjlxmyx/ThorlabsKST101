@@ -161,12 +161,12 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     def set_velosity_normal(self):
         X_axis.set_vel_params(30000, 6000000)
         Y_axis.set_vel_params(30000, 6000000)
-        Z_axis.set_vel_params(30000, 3000000)
+        Z_axis.set_vel_params(30000, 1000000)
 
     def set_velosity_slow(self):
         X_axis.set_vel_params(10000, 500000)
         Y_axis.set_vel_params(10000, 500000)
-        Z_axis.set_vel_params(10000, 100000)
+        Z_axis.set_vel_params(10000, 10000)
 
 
     def keyReleaseEvent(self, event):
