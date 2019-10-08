@@ -6,8 +6,9 @@ os.environ['path'] += ';C:\Program Files\Thorlabs\Kinesis'
 lib = ctypes.cdll.LoadLibrary('C:\Program Files\Thorlabs\Kinesis\Thorlabs.MotionControl.KCube.StepperMotor.dll')
 
 
-class Motor():
+class Motor:
 
+    # SN is a string
     def __init__(self, SN):
         self.SN = ctypes.c_char_p(bytes(SN, 'utf-8'))
         self.Acce_c = ctypes.c_int(0)
