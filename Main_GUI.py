@@ -256,7 +256,7 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
         png = np.reshape(image2, (1920, 2560))
 
-        png = cv2.resize(png, (0, 0), fx=0.5, fy=0.5)
+        png = cv2.resize(png, (0, 0), fx=0.4, fy=0.4)
 
         Qimg = QtGui.QImage(png.data, png.shape[1], png.shape[0], QtGui.QImage.Format_Grayscale8)
         pixmap = QtGui.QPixmap.fromImage(Qimg)
@@ -347,7 +347,7 @@ class CameraThread(QtCore.QThread):
             self.data.dtype = 'uint16'
 
             self.CameraSignal.emit(self.data)
-            time.sleep(0.05)
+            time.sleep(0.1)
 
         ueye.is_FreeImageMem(self.hCam, self.pcImageMemory, self.MemID)
         ueye.is_ExitCamera(self.hCam)

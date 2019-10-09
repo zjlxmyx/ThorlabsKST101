@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1920</width>
-    <height>1080</height>
+    <width>1467</width>
+    <height>880</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,8 +17,8 @@
    <widget class="QPushButton" name="button_S">
     <property name="geometry">
      <rect>
-      <x>1620</x>
-      <y>190</y>
+      <x>1230</x>
+      <y>160</y>
       <width>75</width>
       <height>75</height>
      </rect>
@@ -35,8 +35,8 @@
    <widget class="QPushButton" name="button_A">
     <property name="geometry">
      <rect>
-      <x>1520</x>
-      <y>280</y>
+      <x>1130</x>
+      <y>250</y>
       <width>75</width>
       <height>75</height>
      </rect>
@@ -53,8 +53,8 @@
    <widget class="QPushButton" name="button_W">
     <property name="geometry">
      <rect>
-      <x>1620</x>
-      <y>280</y>
+      <x>1230</x>
+      <y>250</y>
       <width>75</width>
       <height>75</height>
      </rect>
@@ -71,8 +71,8 @@
    <widget class="QPushButton" name="button_D">
     <property name="geometry">
      <rect>
-      <x>1720</x>
-      <y>280</y>
+      <x>1330</x>
+      <y>250</y>
       <width>75</width>
       <height>75</height>
      </rect>
@@ -89,8 +89,8 @@
    <widget class="QPushButton" name="button_R">
     <property name="geometry">
      <rect>
-      <x>1680</x>
-      <y>480</y>
+      <x>1290</x>
+      <y>450</y>
       <width>75</width>
       <height>75</height>
      </rect>
@@ -107,8 +107,8 @@
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>1520</x>
-      <y>370</y>
+      <x>1130</x>
+      <y>340</y>
       <width>241</width>
       <height>51</height>
      </rect>
@@ -177,8 +177,8 @@
    <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
      <rect>
-      <x>1490</x>
-      <y>60</y>
+      <x>1120</x>
+      <y>40</y>
       <width>111</width>
       <height>101</height>
      </rect>
@@ -244,8 +244,8 @@
    <widget class="QPushButton" name="button_MoveTo">
     <property name="geometry">
      <rect>
-      <x>1740</x>
-      <y>70</y>
+      <x>1370</x>
+      <y>50</y>
       <width>75</width>
       <height>51</height>
      </rect>
@@ -262,8 +262,8 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>1610</x>
-      <y>69</y>
+      <x>1240</x>
+      <y>49</y>
       <width>121</width>
       <height>91</height>
      </rect>
@@ -387,8 +387,8 @@
    <widget class="QPushButton" name="button_home">
     <property name="geometry">
      <rect>
-      <x>1740</x>
-      <y>130</y>
+      <x>1370</x>
+      <y>110</y>
       <width>75</width>
       <height>31</height>
      </rect>
@@ -407,8 +407,8 @@
      <rect>
       <x>40</x>
       <y>40</y>
-      <width>1280</width>
-      <height>960</height>
+      <width>1024</width>
+      <height>768</height>
      </rect>
     </property>
     <property name="text">
@@ -418,8 +418,8 @@
    <widget class="QSlider" name="slider_XY">
     <property name="geometry">
      <rect>
-      <x>1520</x>
-      <y>430</y>
+      <x>1130</x>
+      <y>400</y>
       <width>241</width>
       <height>22</height>
      </rect>
@@ -446,8 +446,8 @@
    <widget class="QGroupBox" name="groupBox_3">
     <property name="geometry">
      <rect>
-      <x>1560</x>
-      <y>480</y>
+      <x>1170</x>
+      <y>450</y>
       <width>101</width>
       <height>141</height>
      </rect>
@@ -516,8 +516,8 @@
    <widget class="QPushButton" name="button_F">
     <property name="geometry">
      <rect>
-      <x>1680</x>
-      <y>580</y>
+      <x>1290</x>
+      <y>550</y>
       <width>75</width>
       <height>75</height>
      </rect>
@@ -534,8 +534,8 @@
    <widget class="QLabel" name="label_XY_Verlosity">
     <property name="geometry">
      <rect>
-      <x>1766</x>
-      <y>390</y>
+      <x>1376</x>
+      <y>360</y>
       <width>61</width>
       <height>41</height>
      </rect>
@@ -550,8 +550,8 @@
    <widget class="QLabel" name="label_Z_Verlosity">
     <property name="geometry">
      <rect>
-      <x>1580</x>
-      <y>620</y>
+      <x>1190</x>
+      <y>590</y>
       <width>71</width>
       <height>31</height>
      </rect>
@@ -569,8 +569,8 @@
    <widget class="QSlider" name="slider_Z">
     <property name="geometry">
      <rect>
-      <x>1530</x>
-      <y>480</y>
+      <x>1140</x>
+      <y>450</y>
       <width>22</width>
       <height>161</height>
      </rect>
@@ -597,8 +597,8 @@
    <widget class="QPushButton" name="button_camera">
     <property name="geometry">
      <rect>
-      <x>1530</x>
-      <y>700</y>
+      <x>1140</x>
+      <y>670</y>
       <width>101</width>
       <height>61</height>
      </rect>
@@ -613,8 +613,8 @@
    <widget class="QPushButton" name="button_capture">
     <property name="geometry">
      <rect>
-      <x>1530</x>
-      <y>780</y>
+      <x>1140</x>
+      <y>750</y>
       <width>101</width>
       <height>61</height>
      </rect>
@@ -651,7 +651,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1920</width>
+     <width>1467</width>
      <height>23</height>
     </rect>
    </property>
