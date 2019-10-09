@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>1920</width>
+    <height>1080</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,11 +17,16 @@
    <widget class="QPushButton" name="button_S">
     <property name="geometry">
      <rect>
-      <x>370</x>
-      <y>270</y>
+      <x>1620</x>
+      <y>190</y>
       <width>75</width>
       <height>75</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
     </property>
     <property name="text">
      <string>W</string>
@@ -30,11 +35,16 @@
    <widget class="QPushButton" name="button_A">
     <property name="geometry">
      <rect>
-      <x>280</x>
-      <y>360</y>
+      <x>1520</x>
+      <y>280</y>
       <width>75</width>
       <height>75</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
     </property>
     <property name="text">
      <string>A</string>
@@ -43,11 +53,16 @@
    <widget class="QPushButton" name="button_W">
     <property name="geometry">
      <rect>
-      <x>370</x>
-      <y>360</y>
+      <x>1620</x>
+      <y>280</y>
       <width>75</width>
       <height>75</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
     </property>
     <property name="text">
      <string>S</string>
@@ -56,11 +71,16 @@
    <widget class="QPushButton" name="button_D">
     <property name="geometry">
      <rect>
-      <x>460</x>
-      <y>360</y>
+      <x>1720</x>
+      <y>280</y>
       <width>75</width>
       <height>75</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
     </property>
     <property name="text">
      <string>D</string>
@@ -69,60 +89,34 @@
    <widget class="QPushButton" name="button_R">
     <property name="geometry">
      <rect>
-      <x>550</x>
-      <y>270</y>
+      <x>1680</x>
+      <y>480</y>
       <width>75</width>
       <height>75</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
     </property>
     <property name="text">
      <string>R</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="button_F">
-    <property name="geometry">
-     <rect>
-      <x>550</x>
-      <y>360</y>
-      <width>75</width>
-      <height>75</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>F</string>
-    </property>
-   </widget>
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>280</x>
-      <y>450</y>
+      <x>1520</x>
+      <y>370</y>
       <width>241</width>
       <height>51</height>
      </rect>
     </property>
     <property name="title">
-     <string>Velosity</string>
+     <string>Velosity_XY</string>
     </property>
     <widget class="QRadioButton" name="radioButton_slow">
-     <property name="geometry">
-      <rect>
-       <x>180</x>
-       <y>20</y>
-       <width>70</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>11</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>slow</string>
-     </property>
-    </widget>
-    <widget class="QRadioButton" name="radioButton_fast">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -137,10 +131,7 @@
       </font>
      </property>
      <property name="text">
-      <string>fast</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
+      <string>slow</string>
      </property>
     </widget>
     <widget class="QRadioButton" name="radioButton_normal">
@@ -161,12 +152,33 @@
       <string>normal</string>
      </property>
     </widget>
+    <widget class="QRadioButton" name="radioButton_fast">
+     <property name="geometry">
+      <rect>
+       <x>170</x>
+       <y>20</y>
+       <width>70</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>11</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>fast</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
      <rect>
-      <x>70</x>
-      <y>90</y>
+      <x>1490</x>
+      <y>60</y>
       <width>111</width>
       <height>101</height>
      </rect>
@@ -232,10 +244,10 @@
    <widget class="QPushButton" name="button_MoveTo">
     <property name="geometry">
      <rect>
-      <x>320</x>
-      <y>110</y>
+      <x>1740</x>
+      <y>70</y>
       <width>75</width>
-      <height>71</height>
+      <height>51</height>
      </rect>
     </property>
     <property name="font">
@@ -247,11 +259,11 @@
      <string>Move to</string>
     </property>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>190</x>
-      <y>99</y>
+      <x>1610</x>
+      <y>69</y>
       <width>121</width>
       <height>91</height>
      </rect>
@@ -372,13 +384,274 @@
      </item>
     </layout>
    </widget>
+   <widget class="QPushButton" name="button_home">
+    <property name="geometry">
+     <rect>
+      <x>1740</x>
+      <y>130</y>
+      <width>75</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Home</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_camera">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>40</y>
+      <width>1280</width>
+      <height>960</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Null</string>
+    </property>
+   </widget>
+   <widget class="QSlider" name="slider_XY">
+    <property name="geometry">
+     <rect>
+      <x>1520</x>
+      <y>430</y>
+      <width>241</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>50000</number>
+    </property>
+    <property name="maximum">
+     <number>20000000</number>
+    </property>
+    <property name="singleStep">
+     <number>1</number>
+    </property>
+    <property name="pageStep">
+     <number>10000</number>
+    </property>
+    <property name="value">
+     <number>15000000</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_3">
+    <property name="geometry">
+     <rect>
+      <x>1560</x>
+      <y>480</y>
+      <width>101</width>
+      <height>141</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Velosity_Z</string>
+    </property>
+    <widget class="QRadioButton" name="radioButton_slow_Z">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>100</y>
+       <width>70</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>11</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>slow</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButton_fast_Z">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>20</y>
+       <width>70</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>11</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>fast</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButton_normal_Z">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>60</y>
+       <width>70</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>11</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>normal</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QPushButton" name="button_F">
+    <property name="geometry">
+     <rect>
+      <x>1680</x>
+      <y>580</y>
+      <width>75</width>
+      <height>75</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>F</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_XY_Verlosity">
+    <property name="geometry">
+     <rect>
+      <x>1766</x>
+      <y>390</y>
+      <width>61</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>15000000</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_Z_Verlosity">
+    <property name="geometry">
+     <rect>
+      <x>1580</x>
+      <y>620</y>
+      <width>71</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::LeftToRight</enum>
+    </property>
+    <property name="text">
+     <string>8000000</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QSlider" name="slider_Z">
+    <property name="geometry">
+     <rect>
+      <x>1530</x>
+      <y>480</y>
+      <width>22</width>
+      <height>161</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>5000</number>
+    </property>
+    <property name="maximum">
+     <number>10000000</number>
+    </property>
+    <property name="singleStep">
+     <number>1</number>
+    </property>
+    <property name="pageStep">
+     <number>1000</number>
+    </property>
+    <property name="value">
+     <number>8000000</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="button_camera">
+    <property name="geometry">
+     <rect>
+      <x>1530</x>
+      <y>700</y>
+      <width>101</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Camera</string>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="button_capture">
+    <property name="geometry">
+     <rect>
+      <x>1530</x>
+      <y>780</y>
+      <width>101</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Capture</string>
+    </property>
+    <property name="checkable">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <zorder>label_camera</zorder>
+   <zorder>button_S</zorder>
+   <zorder>button_A</zorder>
+   <zorder>button_W</zorder>
+   <zorder>button_D</zorder>
+   <zorder>button_R</zorder>
+   <zorder>groupBox</zorder>
+   <zorder>groupBox_2</zorder>
+   <zorder>button_MoveTo</zorder>
+   <zorder>layoutWidget</zorder>
+   <zorder>button_home</zorder>
+   <zorder>slider_XY</zorder>
+   <zorder>groupBox_3</zorder>
+   <zorder>button_F</zorder>
+   <zorder>label_XY_Verlosity</zorder>
+   <zorder>label_Z_Verlosity</zorder>
+   <zorder>slider_Z</zorder>
+   <zorder>button_camera</zorder>
+   <zorder>button_capture</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>1920</width>
      <height>23</height>
     </rect>
    </property>

@@ -256,6 +256,8 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
         png = np.reshape(image2, (1920, 2560))
 
+        png = cv2.resize(png, (0, 0), fx=0.5, fy=0.5)
+
         Qimg = QtGui.QImage(png.data, png.shape[1], png.shape[0], QtGui.QImage.Format_Grayscale8)
         pixmap = QtGui.QPixmap.fromImage(Qimg)
         self.label_camera.setPixmap(pixmap)
