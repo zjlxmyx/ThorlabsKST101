@@ -15,6 +15,7 @@ pitch = ueye.INT()
 nBitsPerPixel = ueye.INT(16)    #take 8 bits per pixel for monochrome
 m_nColorMode = ueye.INT()		# Y8/RGB16/RGB24/REG32
 bytes_per_pixel = ueye.INT()
+auto_info = ueye.UEYE_AUTO_INFO()
 
 a = ueye.is_InitCamera(hCam, None)
 b = ueye.is_GetCameraInfo(hCam, cInfo)
@@ -43,8 +44,10 @@ IMAGE_FILE_PARAMS.nFileType = ueye.IS_IMG_PNG
 k = ueye.sizeof(IMAGE_FILE_PARAMS)
 
 nEnable = ctypes.c_int(ueye.IS_AUTOPARAMETER_ENABLE)
-ueye.is_AutoParameter(hCam, ueye.IS_AES_CMD_SET_ENABLE, nEnable, ueye.sizeof(nEnable))
+state = ctypes.c_int()
 
+m = ueye.is_AutoParameter(hCam, ueye.IS_AES_CMD_SET_ENABLE, nEnable, ueye.sizeof(nEnable))
+n = ueye.is_AutoParameter(hCam, ueye.IS_AES_CMD_GET_ENABLE, state, ueye.sizeof(state))
 
 while True:
 
@@ -63,6 +66,8 @@ while True:
 
     frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
     cv2.imshow("SimpleLive_Python_uEye_OpenCV", frame)
+
+    ueye.is_GetAutoInfo(hCam, auto_info)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break

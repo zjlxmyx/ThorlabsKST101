@@ -226,8 +226,8 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.label_Z_Verlosity.setText('1000000')
 
     def set_velosity_slow_Z(self):
-        Z_axis.set_vel_params(100000, 10000)
-        self.slider_Z.setValue(10000)
+        Z_axis.set_vel_params(100000, 20000)
+        self.slider_Z.setValue(20000)
         self.label_Z_Verlosity.setText('10000')
 
     def keyReleaseEvent(self, event):
@@ -349,7 +349,7 @@ class CameraThread(QtCore.QThread):
         self.IMAGE_FILE_PARAMS.nFileType = ueye.IS_IMG_PNG
         self.k = ueye.sizeof(self.IMAGE_FILE_PARAMS)
 
-        ueye.is_AutoParameter(self.hCam, ueye.IS_AES_CMD_SET_ENABLE, self.autoParameter, ueye.sizeof(self.autoParameter))
+        # ueye.is_AutoParameter(self.hCam, ueye.IS_AES_CMD_SET_ENABLE, self.autoParameter, ueye.sizeof(self.autoParameter))
 
         while self.flag:
             self.data = np.ctypeslib.as_array(ctypes.cast(self.pcImageMemory, ctypes.POINTER(ctypes.c_ubyte)), (self.height * self.pitch,))
