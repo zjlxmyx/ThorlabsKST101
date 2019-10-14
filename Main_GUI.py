@@ -226,9 +226,9 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.label_Z_Verlosity.setText('1000000')
 
     def set_velosity_slow_Z(self):
-        Z_axis.set_vel_params(100000, 20000)
-        self.slider_Z.setValue(20000)
-        self.label_Z_Verlosity.setText('10000')
+        Z_axis.set_vel_params(100000, 100000)
+        self.slider_Z.setValue(100000)
+        self.label_Z_Verlosity.setText('100000')
 
     def keyReleaseEvent(self, event):
         # release W
