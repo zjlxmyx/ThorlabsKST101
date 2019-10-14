@@ -117,6 +117,9 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     def home(self):
         time.sleep(0.1)
+
+        self.statusBar().showMessage('Homing')
+
         X_axis.set_vel_params(500000, 30000000)
         Y_axis.set_vel_params(500000, 30000000)
         Z_axis.set_vel_params(500000, 30000000)
@@ -138,6 +141,9 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         X_axis.set_vel_params(500000, 15000000)
         Y_axis.set_vel_params(500000, 15000000)
         Z_axis.set_vel_params(500000, 15000000)
+
+        self.statusBar().showMessage('')
+
 
     def set_velosity_xy(self):
         X_axis.set_vel_params(100000, self.slider_XY.value())
