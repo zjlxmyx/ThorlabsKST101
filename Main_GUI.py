@@ -313,6 +313,7 @@ class CameraThread(QtCore.QThread):
         self.data1 = None
         self.data2 = None
         self.flag = True
+        self.autoParameter = ctypes.c_int(ueye.IS_AUTOPARAMETER_ENABLE)
 
 
     # emit the signal every 0.2s
@@ -341,6 +342,8 @@ class CameraThread(QtCore.QThread):
         self.IMAGE_FILE_PARAMS = ueye.IMAGE_FILE_PARAMS(self.pcImageMemory, self.MemID)
         self.IMAGE_FILE_PARAMS.nFileType = ueye.IS_IMG_PNG
         self.k = ueye.sizeof(self.IMAGE_FILE_PARAMS)
+
+        ueye.is_AutoParameter(self.hCam, ueye.IS_AES_CMD_SET_ENABLE, self.autoParameter, ueye.sizeof(self.autoParameter))
 
         while self.flag:
             self.data = np.ctypeslib.as_array(ctypes.cast(self.pcImageMemory, ctypes.POINTER(ctypes.c_ubyte)), (self.height * self.pitch,))
