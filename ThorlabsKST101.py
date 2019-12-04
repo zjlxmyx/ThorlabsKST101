@@ -28,32 +28,48 @@ class Motor:
     # Returns the error code (see Error Codes) or zero if successful.
     def connect(self):
         lib.TLI_BuildDeviceList()
-        return lib.SCC_Open(self.SN)
+        err = lib.SCC_Open(self.SN)
+        if err:
+            print("open device failed with error code ", err)
+            return
 
     # Starts the internal polling loop which continuously requests position and status.
     # Returns true if successful, false if not.
     def start_polling(self, ms):
-        return lib.SCC_StartPolling(self.SN, ms)
+        err = lib.SCC_StartPolling(self.SN, ms)
+        if not err:
+            print("start polling failed with error code ", err)
 
     # Stop the internal polling loop.
     # Returns true if successful, false if not.
     def stop_polling(self):
-        return lib.SCC_StopPolling(self.SN)
+        err = lib.SCC_StopPolling(self.SN)
+        if not err:
+            print("stop polling failed with error code ", err)
 
     # Home the device.
     # Returns the error code (see Error Codes) or zero if move successfully started.
     def home(self):
-        return lib.SCC_Home(self.SN)
+        err = lib.SCC_Home(self.SN)
+        if err:
+            print("Home failed with error code ", err)
+            return
 
     # Sets the move velocity parameters.
     # Returns the error code (see Error Codes) or zero if successful.
     def set_vel_params(self, Acce, MaxV):
-        return lib.SCC_SetVelParams(self.SN, Acce, MaxV)
+        err = lib.SCC_SetVelParams(self.SN, Acce, MaxV)
+        if err:
+            print("set velocity failed with error code ", err)
+            return
 
     # Gets the move velocity parameters.
     # Returns the Acceleration and MaxVelocity
     def get_vel_params(self):
-        lib.SCC_GetVelParams(self.SN, ctypes.byref(self.Acce_c), ctypes.byref(self.MaxV_c))
+        err = lib.SCC_GetVelParams(self.SN, ctypes.byref(self.Acce_c), ctypes.byref(self.MaxV_c))
+        if err:
+            print("get velocity failed with error code ", err)
+            return
         self.Acce = self.Acce_c.value
         self.MaxV = self.MaxV_c.value
         return self.Acce, self.MaxV
@@ -61,12 +77,18 @@ class Motor:
     # Sets jog velocity parameters.
     # Returns The error code (see Error Codes) or zero if successful.
     def set_jog_vel_params(self, JogAcce, JogMaxV):
-        return lib.SCC_SetJogVelParams(self.SN, JogAcce, JogMaxV)
+        err = lib.SCC_SetJogVelParams(self.SN, JogAcce, JogMaxV)
+        if err:
+            print("set Jog velocity failed with error code ", err)
+            return
 
     # Gets the jog velocity parameters.
     # Returns the Acceleration and MaxVelocity
     def get_jog_vel_params(self):
-        lib.SCC_GetVelParams(self.SN, ctypes.byref(self.JogAcce_c), ctypes.byref(self.JogMaxV_c))
+        err = lib.SCC_GetJogVelParams(self.SN, ctypes.byref(self.JogAcce_c), ctypes.byref(self.JogMaxV_c))
+        if err:
+            print("get Jog velocity failed with error code ", err)
+            return
         self.JogAcce = self.JogAcce_c.value
         self.JogMaxV = self.JogMaxV_c.value
         return self.JogAcce, self.JogMaxV
@@ -75,11 +97,17 @@ class Motor:
     # jogmode: Jog step 1 ,Continuous 2 ; stopmode: Immediate Stop 1 ,Profiled Stop 2
     # Returns The error code (see Error Codes) or zero if successful.
     def set_jog_mode(self, jogmode, stopmode):
-        return lib.SCC_SetJogMode(self.SN, jogmode, stopmode)
+        err = lib.SCC_SetJogMode(self.SN, jogmode, stopmode)
+        if err:
+            print("set Jog mode failed with error code ", err)
+            return
 
     # Gets the jog mode.
     def get_jog_mode(self):
-        lib.SCC_GetJogMode(self.SN, ctypes.byref(self.JogMode_c), ctypes.byref(self.StopMode_c))
+        err = lib.SCC_GetJogMode(self.SN, ctypes.byref(self.JogMode_c), ctypes.byref(self.StopMode_c))
+        if err:
+            print("get Jog mode failed with error code ", err)
+            return
         self.JogMode = self.JogMode_c.value
         self.StopMode = self.StopMode_c.value
         return self.JogMode, self.StopMode
@@ -87,28 +115,43 @@ class Motor:
     # Sets the distance to move on jogging.
     # Returns The error code (see Error Codes) or zero if successful.
     def set_jog_step_size(self, stepsize):
-        return lib.SCC_SetJogStepSize(self.SN, stepsize)
+        err = lib.SCC_SetJogStepSize(self.SN, stepsize)
+        if err:
+            print("set Jog step size failed with error code ", err)
+            return
 
     # Gets the distance to move when jogging.
     # Returns The step in Device Units.
     def get_jog_step_size(self):
-        return lib.SCC_GetJogStepSize(self.SN)
+        err = lib.SCC_GetJogStepSize(self.SN)
+        if err:
+            print("get Jog step size failed with error code ", err)
+            return
 
     # Move the device to the specified position (index).
     # Returns the error code (see Error Codes) or zero if move successfully started.
     def move_to_position(self, Position):
-        return lib.SCC_MoveToPosition(self.SN, Position)
+        err = lib.SCC_MoveToPosition(self.SN, Position)
+        if err:
+            print("move to position failed with error code ", err)
+            return
 
     # Start moving at the current velocity in the specified direction.
     # direction: 1 forwards, 2 backwards
     # Returns The error code (see Error Codes) or zero if successful.
     def move_at_velocity(self, direction):
-        return lib.SCC_MoveAtVelocity(self.SN, direction)
+        err = lib.SCC_MoveAtVelocity(self.SN, direction)
+        if err:
+            print("move at velocity failed with error code ", err)
+            return
 
     # Stop the current move using the current velocity profile.
     # Returns The error code (see Error Codes) or zero if successful.
     def stop_profiled(self):
-        return lib.SCC_StopProfiled(self.SN)
+        err = lib.SCC_StopProfiled(self.SN)
+        if err:
+            print("stop moving failed with error code ", err)
+            return
 
     # Get the current position.
     # The current position is the last recorded position.

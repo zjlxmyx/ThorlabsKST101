@@ -18,12 +18,14 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
         self.init_UI()
         self.init_motor()
+        self.pos_X = 5000000
+        self.pos_Y = 0
+        self.pos_Z = 0
 
-        # Multitasking for position from motors
-        self.PositionThread = Thread()
-        # Connecting the signal of new Thread to position refresh function
-        self.PositionThread.PositionSignal.connect(self.position_refresh)
-        self.PositionThread.start()
+        self.leftup = None
+        self.leftdown = None
+        self.rightup = None
+        self.rightdown = None
 
         self.camera = CameraThread()
         self.camera.CameraSignal.connect(self.camera_show)
@@ -93,15 +95,26 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.button_camera.clicked.connect(self.camera_task)
         self.button_capture.clicked.connect(self.capture)
 
+        # Button of saving corner position
+        self.button_LeftUp.clicked.connect(self.save_leftup)
+        self.button_LeftDown.clicked.connect(self.save_leftdown)
+        self.button_RightUp.clicked.connect(self.save_rightup)
+        self.button_RightDown.clicked.connect(self.save_rightdown)
+
 
     # function of showing position of motors
     def position_refresh(self):
         XPosition = X_axis.get_position()
         self.label_x.setText(str(XPosition))
+        self.pos_X = XPosition
+
         YPosition = Y_axis.get_position()
         self.label_y.setText(str(YPosition))
+        self.pos_Y = YPosition
+
         ZPosition = Z_axis.get_position()
         self.label_z.setText(str(ZPosition))
+        self.pos_Z = ZPosition
 
     # function of move to button
     def move_to(self):
@@ -116,6 +129,13 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
 
     def home(self):
+        time.sleep(0.1)
+
+        # Multitasking for position from motors
+        self.PositionThread = Thread()
+        # Connecting the signal of new Thread to position refresh function
+        self.PositionThread.PositionSignal.connect(self.position_refresh)
+        self.PositionThread.start()
         time.sleep(0.1)
 
         self.statusBar().showMessage('Homing')
@@ -255,6 +275,29 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         elif (event.key() == QtCore.Qt.Key_F) and (not event.isAutoRepeat()):
             Z_axis.stop_profiled()
 
+    # save and show position of corner on button
+    def save_leftup(self):
+        self.leftup = [self.pos_X, self.pos_Y, self.pos_Z]
+        text = "Left Up" + "\nx= " + str(self.pos_X) + " \ny= " + str(self.pos_Y)
+        self.button_LeftUp.setText(text)
+
+    def save_leftdown(self):
+        self.leftdown = [self.pos_X, self.pos_Y, self.pos_Z]
+        text = "Left Down" + "\nx= " + str(self.pos_X) + " \ny= " + str(self.pos_Y)
+        self.button_LeftDown.setText(text)
+
+    def save_rightup(self):
+        self.rightup = [self.pos_X, self.pos_Y, self.pos_Z]
+        text = "Right Up" + "\nx= " + str(self.pos_X) + " \ny= " + str(self.pos_Y)
+        self.button_RightUp.setText(text)
+
+    def save_rightdown(self):
+        self.rightdown = [self.pos_X, self.pos_Y, self.pos_Z]
+        text = "Right Down" + "\nx= " + str(self.pos_X) + " \ny= " + str(self.pos_Y)
+        self.button_RightDown.setText(text)
+
+
+
     def camera_show(self, image):
         self.SaveImage = image
         image1 = image / 4095 * 255
@@ -321,8 +364,6 @@ class CameraThread(QtCore.QThread):
         self.flag = True
         self.autoParameter = ctypes.c_int(ueye.IS_AUTOPARAMETER_ENABLE)
 
-
-    # emit the signal every 0.2s
     def run(self):
 
         a = ueye.is_InitCamera(self.hCam, None)
