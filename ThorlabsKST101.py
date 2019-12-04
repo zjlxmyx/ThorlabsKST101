@@ -27,6 +27,7 @@ class Motor:
     # Connect to motor.
     # Returns the error code (see Error Codes) or zero if successful.
     def connect(self):
+        lib.TLI_BuildDeviceList()
         return lib.SCC_Open(self.SN)
 
     # Starts the internal polling loop which continuously requests position and status.
