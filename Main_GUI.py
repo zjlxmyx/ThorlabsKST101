@@ -6,6 +6,10 @@ from ui_designer_main_GUI import Ui_MainWindow
 from PyQt5 import QtCore, QtGui, QtWidgets
 from ThorlabsKST101 import *
 from pyueye import ueye
+import extraLib
+import CanonLib
+from turbojpeg import TurboJPEG
+jpeg = TurboJPEG("turbojpeg.dll")
 
 
 
@@ -22,15 +26,18 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.pos_Y = 0
         self.pos_Z = 0
 
+
+
         self.leftup = None
         self.leftdown = None
         self.rightup = None
         self.rightdown = None
 
-        self.camera = CameraThread()
-        self.camera.CameraSignal.connect(self.camera_show)
+        self.STW = None
+        self.WTS = None
+        self.waferCoordFlag = False
 
-        self.SaveImage = None
+
 
 
 
@@ -92,8 +99,7 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.slider_Z.valueChanged.connect(lambda: self.label_Z_Verlosity.setText(str(self.slider_Z.value())))
         self.slider_Z.sliderReleased.connect(self.set_velosity_z)
 
-        self.button_camera.clicked.connect(self.camera_task)
-        self.button_capture.clicked.connect(self.capture)
+
 
         # Button of saving corner position
         self.button_LeftUp.clicked.connect(self.save_leftup)
@@ -101,20 +107,28 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.button_RightUp.clicked.connect(self.save_rightup)
         self.button_RightDown.clicked.connect(self.save_rightdown)
 
+        # new coordinate system
+        self.button_coord.clicked.connect(self.create_wafer_coordinate)
+        self.button_MoveTo_wafer.clicked.connect(self.move_to_wafer)
+
+        # comboBox to select camera
+        self.comboBox.activated.connect(self.select_camera)
 
     # function of showing position of motors
     def position_refresh(self):
-        XPosition = X_axis.get_position()
-        self.label_x.setText(str(XPosition))
-        self.pos_X = XPosition
+        self.pos_X = X_axis.get_position()
+        self.label_x.setText(str(self.pos_X))
 
-        YPosition = Y_axis.get_position()
-        self.label_y.setText(str(YPosition))
-        self.pos_Y = YPosition
+        self.pos_Y = Y_axis.get_position()
+        self.label_y.setText(str(self.pos_Y))
 
-        ZPosition = Z_axis.get_position()
-        self.label_z.setText(str(ZPosition))
-        self.pos_Z = ZPosition
+        self.pos_Z = Z_axis.get_position()
+        self.label_z.setText(str(self.pos_Z))
+
+        if self.waferCoordFlag:
+            waferPosition = extraLib.get_new_pos(self.STW, [self.pos_X, self.pos_Y])
+            self.label_wafer_x.setText(str(waferPosition[0]))
+            self.label_wafer_y.setText(str(waferPosition[1]))
 
     # function of move to button
     def move_to(self):
@@ -132,7 +146,7 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         time.sleep(0.1)
 
         # Multitasking for position from motors
-        self.PositionThread = Thread()
+        self.PositionThread = PositionRefreshThread()
         # Connecting the signal of new Thread to position refresh function
         self.PositionThread.PositionSignal.connect(self.position_refresh)
         self.PositionThread.start()
@@ -234,7 +248,6 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.slider_XY.setValue(500000)
         self.label_XY_Verlosity.setText('500000')
 
-
     def set_velosity_fast_Z(self):
         Z_axis.set_vel_params(100000, 8000000)
         self.slider_Z.setValue(8000000)
@@ -296,9 +309,71 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         text = "Right Down" + "\nx= " + str(self.pos_X) + " \ny= " + str(self.pos_Y)
         self.button_RightDown.setText(text)
 
+    def create_wafer_coordinate(self):
+        self.STW, self.WTS = extraLib.get_matrix(self.leftdown, self.rightdown)
+        self.waferCoordFlag = True
 
+    def move_to_wafer(self):
+        stageX = int(self.lineEdit_xMoveTo_wafer.text())
+        stageY = int(self.lineEdit_yMoveTo_wafer.text())
+        stagePosition = extraLib.get_new_pos(self.WTS, [stageX, stageY])
+        X_axis.move_to_position(stagePosition[0])
+        Y_axis.move_to_position(stagePosition[1])
 
-    def camera_show(self, image):
+    def select_camera(self):
+        print(self.comboBox.currentIndex())
+        if self.comboBox.currentIndex() == 1:
+            # self.selectedCamera = CameraThread_Canon_EOS_600D
+            self.camera_init = self.camera_init_Canon
+            self.camera_show = self.camera_show_Canon
+            self.capture = self.capture_Canon
+        elif self.comboBox.currentIndex() == 2:
+            # self.selectedCamera = CameraThread_UI_3480LE_M_GL()
+            self.camera_init = self.camera_init_UI_3480LE
+            self.camera_show = self.camera_show_UI_3480LE
+            self.capture = self.capture_UI_3480LE
+
+        self.button_camera.clicked.connect(self.camera_init)
+        self.button_capture.clicked.connect(self.capture)
+
+    # ------------------------------camera for Canon_EOS_600D ----------------------------------
+    def camera_init_Canon(self):
+        if self.pushButton_camera.isChecked():
+            self.pushButton_camera.setText('Camera ON')
+            self.camera = CameraThread_Canon_EOS_600D()
+            self.camera.CameraSignal.connect(self.camera_show)
+            self.camera_thread.flag = True
+            self.camera_thread.start()
+        else:
+            self.pushButton_camera.setText('Camera')
+            self.camera_thread.flag = False
+
+    def camera_show_Canon(self, image):
+        frame = jpeg.decode(image)
+        Qimg = QtGui.QImage(frame.data, frame.shape[1], frame.shape[0], QtGui.QImage.Format_RGB888)
+        Qimg = Qimg.rgbSwapped()
+        pixmap = QtGui.QPixmap.fromImage(Qimg)
+        self.label_image_show.setPixmap(pixmap)
+
+    def capture_Canon(self):
+        self.camera_thread.camera.set_Capture_ready()
+        self.camera_thread.camera.get_Capture_image()
+
+    # ------------------------------camera for UI_3480LE_M_GL ----------------------------------
+    def camera_init_UI_3480LE(self):
+        if self.button_camera.isChecked():
+            self.camera = CameraThread_UI_3480LE_M_GL()
+            self.camera.CameraSignal.connect(self.camera_show)
+            self.SaveImage = None
+            self.button_camera.setText('Camera ON')
+            self.camera.flag = True
+            self.camera.start()
+
+        else:
+            self.button_camera.setText('Camera')
+            self.camera.flag = False
+
+    def camera_show_UI_3480LE(self, image):
         self.SaveImage = image
         image1 = image / 4095 * 255
         image2 = image1.astype('uint8')
@@ -311,23 +386,12 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         pixmap = QtGui.QPixmap.fromImage(Qimg)
         self.label_camera.setPixmap(pixmap)
 
-    def camera_task(self):
-        if self.button_camera.isChecked():
-            self.button_camera.setText('Camera ON')
-            self.camera.flag = True
-            self.camera.start()
-
-        else:
-            self.button_camera.setText('Camera')
-            self.camera.flag = False
-
-
-    def capture(self):
+    def capture_UI_3480LE(self):
         ueye.is_ImageFile(self.camera.hCam, ueye.IS_IMAGE_FILE_CMD_SAVE, self.camera.IMAGE_FILE_PARAMS, self.camera.k)
 
 
 # create the Thread Class
-class Thread(QtCore.QThread):
+class PositionRefreshThread(QtCore.QThread):
     # define a new Signal without value
     PositionSignal = QtCore.pyqtSignal()
 
@@ -341,7 +405,7 @@ class Thread(QtCore.QThread):
             self.PositionSignal.emit()
 
 
-class CameraThread(QtCore.QThread):
+class CameraThread_UI_3480LE_M_GL(QtCore.QThread):
     CameraSignal = QtCore.pyqtSignal(np.ndarray)
 
     def __init__(self):
@@ -403,7 +467,26 @@ class CameraThread(QtCore.QThread):
         ueye.is_ExitCamera(self.hCam)
 
 
+class CameraThread_Canon_EOS_600D(QtCore.QThread):
+    CameraSignal = QtCore.pyqtSignal(np.ndarray)
 
+    def __init__(self):
+        super().__init__()
+        self.camera = None
+        self.data = None
+        self.flag = None
+
+    def run(self):
+        self.camera = CanonLib.CanonCamera()
+        self.camera.Init_Camera()
+        self.camera.set_LiveView_ready()
+        while self.flag:
+            self.data = self.camera.get_Live_image()
+            if (self.data.size != 0) and (self.data[0] != 0):
+                self.CameraSignal.emit(self.data)
+                time.sleep(0.1)
+        self.camera.Release_Live()
+        self.camera.Terminate()
 
 
 
