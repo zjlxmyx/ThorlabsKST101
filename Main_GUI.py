@@ -12,7 +12,6 @@ from turbojpeg import TurboJPEG
 jpeg = TurboJPEG("turbojpeg.dll")
 
 
-
 class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     def __init__(self):
@@ -36,10 +35,6 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.STW = None
         self.WTS = None
         self.waferCoordFlag = False
-
-
-
-
 
     def init_motor(self):
         global X_axis, Y_axis, Z_axis
@@ -141,7 +136,6 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         if self.checkBox_zMove.isChecked():
             Z_axis.move_to_position(int(self.lineEdit_zMoveTo.text()))
 
-
     def home(self):
         time.sleep(0.1)
 
@@ -186,7 +180,41 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     def set_velosity_z(self):
         Z_axis.set_vel_params(100000, self.slider_Z.value())
 
-    # Keyboard motors controller
+    # set velocity panel ---------------------------------------------------------------------------
+    def set_velosity_fast(self):
+        X_axis.set_vel_params(100000, 15000000)
+        Y_axis.set_vel_params(100000, 15000000)
+        self.slider_XY.setValue(15000000)
+        self.label_XY_Verlosity.setText('15000000')
+
+    def set_velosity_normal(self):
+        X_axis.set_vel_params(100000, 6000000)
+        Y_axis.set_vel_params(100000, 6000000)
+        self.slider_XY.setValue(6000000)
+        self.label_XY_Verlosity.setText('6000000')
+
+    def set_velosity_slow(self):
+        X_axis.set_vel_params(100000, 500000)
+        Y_axis.set_vel_params(100000, 500000)
+        self.slider_XY.setValue(500000)
+        self.label_XY_Verlosity.setText('500000')
+
+    def set_velosity_fast_Z(self):
+        Z_axis.set_vel_params(100000, 8000000)
+        self.slider_Z.setValue(8000000)
+        self.label_Z_Verlosity.setText('8000000')
+
+    def set_velosity_normal_Z(self):
+        Z_axis.set_vel_params(100000, 1000000)
+        self.slider_Z.setValue(1000000)
+        self.label_Z_Verlosity.setText('1000000')
+
+    def set_velosity_slow_Z(self):
+        Z_axis.set_vel_params(100000, 100000)
+        self.slider_Z.setValue(100000)
+        self.label_Z_Verlosity.setText('100000')
+
+    # Keyboard motors controller -------------------------------------------------------------------
     def keyPressEvent(self, event):
         # press W
         if (event.key() == QtCore.Qt.Key_W) and (not event.isAutoRepeat()):
@@ -230,39 +258,6 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
                 self.radioButton_slow.setChecked(True)
                 self.set_velosity_slow()
 
-    def set_velosity_fast(self):
-        X_axis.set_vel_params(100000, 15000000)
-        Y_axis.set_vel_params(100000, 15000000)
-        self.slider_XY.setValue(15000000)
-        self.label_XY_Verlosity.setText('15000000')
-
-    def set_velosity_normal(self):
-        X_axis.set_vel_params(100000, 6000000)
-        Y_axis.set_vel_params(100000, 6000000)
-        self.slider_XY.setValue(6000000)
-        self.label_XY_Verlosity.setText('6000000')
-
-    def set_velosity_slow(self):
-        X_axis.set_vel_params(100000, 500000)
-        Y_axis.set_vel_params(100000, 500000)
-        self.slider_XY.setValue(500000)
-        self.label_XY_Verlosity.setText('500000')
-
-    def set_velosity_fast_Z(self):
-        Z_axis.set_vel_params(100000, 8000000)
-        self.slider_Z.setValue(8000000)
-        self.label_Z_Verlosity.setText('8000000')
-
-    def set_velosity_normal_Z(self):
-        Z_axis.set_vel_params(100000, 1000000)
-        self.slider_Z.setValue(1000000)
-        self.label_Z_Verlosity.setText('1000000')
-
-    def set_velosity_slow_Z(self):
-        Z_axis.set_vel_params(100000, 100000)
-        self.slider_Z.setValue(100000)
-        self.label_Z_Verlosity.setText('100000')
-
     def keyReleaseEvent(self, event):
         # release W
         if (event.key() == QtCore.Qt.Key_W) and (not event.isAutoRepeat()):
@@ -288,7 +283,7 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         elif (event.key() == QtCore.Qt.Key_F) and (not event.isAutoRepeat()):
             Z_axis.stop_profiled()
 
-    # save and show position of corner on button
+    # save and show position of corner on button ----------------------------------------------------
     def save_leftup(self):
         self.leftup = [self.pos_X, self.pos_Y, self.pos_Z]
         text = "Left Up" + "\nx= " + str(self.pos_X) + " \ny= " + str(self.pos_Y)
@@ -321,7 +316,6 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         Y_axis.move_to_position(stagePosition[1])
 
     def select_camera(self):
-        print(self.comboBox.currentIndex())
         if self.comboBox.currentIndex() == 1:
             # self.selectedCamera = CameraThread_Canon_EOS_600D
             self.camera_init = self.camera_init_Canon
@@ -338,12 +332,12 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     # ------------------------------camera for Canon_EOS_600D ----------------------------------
     def camera_init_Canon(self):
-        if self.pushButton_camera.isChecked():
-            self.pushButton_camera.setText('Camera ON')
+        if self.button_camera.isChecked():
+            self.button_camera.setText('Camera ON')
             self.camera = CameraThread_Canon_EOS_600D()
             self.camera.CameraSignal.connect(self.camera_show)
-            self.camera_thread.flag = True
-            self.camera_thread.start()
+            self.camera.flag = True
+            self.camera.start()
         else:
             self.pushButton_camera.setText('Camera')
             self.camera_thread.flag = False
@@ -390,7 +384,7 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         ueye.is_ImageFile(self.camera.hCam, ueye.IS_IMAGE_FILE_CMD_SAVE, self.camera.IMAGE_FILE_PARAMS, self.camera.k)
 
 
-# create the Thread Class
+# create the Thread Class ---------------------------------------------------------------------------
 class PositionRefreshThread(QtCore.QThread):
     # define a new Signal without value
     PositionSignal = QtCore.pyqtSignal()
