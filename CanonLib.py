@@ -119,7 +119,7 @@ class CanonCamera:
         err = EDSDK.EdsDownloadEvfImage(self.CameraRef, self.evfImage)
         if err:
             print("download EvfImage failed with error code ", err)
-            return
+            # return
 
         EDSDK.EdsGetPointer(self.LiveStream, ctypes.byref(Pointer))
         EDSDK.EdsGetLength(self.LiveStream, ctypes.byref(imageLen))
@@ -133,7 +133,7 @@ class CanonCamera:
         err = EDSDK.EdsOpenSession(self.CameraRef)
         if err:
             print("open session failed with error code ", err)
-            return
+            # return
 
         kEdsObjectEvent_All = 0x00000200
         err = EDSDK.EdsSetObjectEventHandler(self.CameraRef, kEdsObjectEvent_All, ObjectHandler, None)
@@ -173,10 +173,10 @@ class CanonCamera:
     def Release_Live(self):
         EDSDK.EdsRelease(self.LiveStream)
         EDSDK.EdsRelease(self.evfImage)
-        EDSDK.EdsCloseSession(self.CameraRef)
+
 
     def Terminate(self):
-
+        EDSDK.EdsCloseSession(self.CameraRef)
         EDSDK.EdsTerminateSDK()
 
 

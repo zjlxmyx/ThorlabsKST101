@@ -317,7 +317,9 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     def select_camera(self):
         if self.comboBox.currentIndex() == 1:
-            # self.selectedCamera = CameraThread_Canon_EOS_600D
+            global c
+            c = CanonLib.CanonCamera()
+            self.camera = CameraThread_Canon_EOS_600D()
             self.camera_init = self.camera_init_Canon
             self.camera_show = self.camera_show_Canon
             self.capture = self.capture_Canon
@@ -334,24 +336,26 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     def camera_init_Canon(self):
         if self.button_camera.isChecked():
             self.button_camera.setText('Camera ON')
-            self.camera = CameraThread_Canon_EOS_600D()
             self.camera.CameraSignal.connect(self.camera_show)
             self.camera.flag = True
             self.camera.start()
         else:
-            self.pushButton_camera.setText('Camera')
-            self.camera_thread.flag = False
+            self.button_camera.setText('Camera')
+            self.camera.flag = False
 
     def camera_show_Canon(self, image):
         frame = jpeg.decode(image)
         Qimg = QtGui.QImage(frame.data, frame.shape[1], frame.shape[0], QtGui.QImage.Format_RGB888)
         Qimg = Qimg.rgbSwapped()
         pixmap = QtGui.QPixmap.fromImage(Qimg)
-        self.label_image_show.setPixmap(pixmap)
+        self.label_camera.setPixmap(pixmap)
 
     def capture_Canon(self):
-        self.camera_thread.camera.set_Capture_ready()
-        self.camera_thread.camera.get_Capture_image()
+        self.camera.flag = False
+        c.set_Capture_ready()
+        c.get_Capture_image()
+        self.camera.flag = True
+        self.camera.start()
 
     # ------------------------------camera for UI_3480LE_M_GL ----------------------------------
     def camera_init_UI_3480LE(self):
@@ -383,6 +387,14 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     def capture_UI_3480LE(self):
         ueye.is_ImageFile(self.camera.hCam, ueye.IS_IMAGE_FILE_CMD_SAVE, self.camera.IMAGE_FILE_PARAMS, self.camera.k)
 
+
+
+    def closeEvent(self, event):
+        # global c
+        self.camera.quit()
+        time.sleep(0.5)
+        c.Release_Live()
+        c.Terminate()
 
 # create the Thread Class ---------------------------------------------------------------------------
 class PositionRefreshThread(QtCore.QThread):
@@ -469,18 +481,20 @@ class CameraThread_Canon_EOS_600D(QtCore.QThread):
         self.camera = None
         self.data = None
         self.flag = None
+        c.Init_Camera()
+
 
     def run(self):
-        self.camera = CanonLib.CanonCamera()
-        self.camera.Init_Camera()
+        self.camera = c
         self.camera.set_LiveView_ready()
+        time.sleep(1)
         while self.flag:
             self.data = self.camera.get_Live_image()
             if (self.data.size != 0) and (self.data[0] != 0):
                 self.CameraSignal.emit(self.data)
                 time.sleep(0.1)
         self.camera.Release_Live()
-        self.camera.Terminate()
+        # self.camera.Terminate()
 
 
 

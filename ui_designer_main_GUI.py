@@ -165,7 +165,7 @@ class Ui_MainWindow(object):
         self.label_camera = QtWidgets.QLabel(self.centralwidget)
         self.label_camera.setGeometry(QtCore.QRect(200, 40, 1200, 800))
         self.label_camera.setText("")
-        self.label_camera.setPixmap(QtGui.QPixmap("../../Desktop/Nanostrukturen_Logo.bmp"))
+        self.label_camera.setPixmap(QtGui.QPixmap("Nanostrukturen_Logo.bmp"))
         self.label_camera.setObjectName("label_camera")
         self.slider_XY = QtWidgets.QSlider(self.centralwidget)
         self.slider_XY.setGeometry(QtCore.QRect(1470, 400, 241, 22))
