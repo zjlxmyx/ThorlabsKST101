@@ -17,9 +17,10 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.hide_all_scale()
         self.show()
 
-        self.init_UI()
+        self.init_UIconnect()
         self.init_motor()
         self.pos_X = 5000000
         self.pos_Y = 0
@@ -35,6 +36,14 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.STW = None
         self.WTS = None
         self.waferCoordFlag = False
+
+    def hide_all_scale(self):
+        self.label_cross.setVisible(False)
+        self.label_scale_2dot5.setVisible(False)
+        self.label_scale_10.setVisible(False)
+        self.label_scale_20.setVisible(False)
+        self.label_scale_50.setVisible(False)
+        self.label_scale_100.setVisible(False)
 
     def init_motor(self):
         global X_axis, Y_axis, Z_axis
@@ -52,7 +61,7 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         Y_axis.start_polling(200)
         Z_axis.start_polling(200)
 
-    def init_UI(self):
+    def init_UIconnect(self):
 
         # button function ------ motor move with velocity, and stop mode
         self.button_A.pressed.connect(lambda: X_axis.move_at_velocity(2))
@@ -107,7 +116,10 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.button_MoveTo_wafer.clicked.connect(self.move_to_wafer)
 
         # comboBox to select camera
-        self.comboBox.activated.connect(self.select_camera)
+        self.comboBox_cameraList.activated.connect(self.select_camera)
+
+        self.comboBox_centerCross.activated.connect(self.select_center_mark)
+        self.comboBox_scale.activated.connect(self.select_scale)
 
     # function of showing position of motors
     def position_refresh(self):
@@ -315,15 +327,35 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         X_axis.move_to_position(stagePosition[0])
         Y_axis.move_to_position(stagePosition[1])
 
+    def select_center_mark(self):
+        self.hide_all_scale()
+        if self.comboBox_centerCross.currentIndex() == 1:
+            self.label_cross.setVisible(True)
+
+    def select_scale(self):
+        self.hide_all_scale()
+        if self.comboBox_scale.currentIndex() == 1:
+            self.label_scale_2dot5.setVisible(True)
+        elif self.comboBox_scale.currentIndex() == 2:
+            self.label_scale_10.setVisible(True)
+        elif self.comboBox_scale.currentIndex() == 3:
+            self.label_scale_20.setVisible(True)
+        elif self.comboBox_scale.currentIndex() == 4:
+            self.label_scale_50.setVisible(True)
+        elif self.comboBox_scale.currentIndex() == 5:
+            self.label_scale_100.setVisible(True)
+
+
+
     def select_camera(self):
-        if self.comboBox.currentIndex() == 1:
+        if self.comboBox_cameraList.currentIndex() == 1:
             global c
             c = CanonLib.CanonCamera()
             self.camera = CameraThread_Canon_EOS_600D()
             self.camera_init = self.camera_init_Canon
             self.camera_show = self.camera_show_Canon
             self.capture = self.capture_Canon
-        elif self.comboBox.currentIndex() == 2:
+        elif self.comboBox_cameraList.currentIndex() == 2:
             # self.selectedCamera = CameraThread_UI_3480LE_M_GL()
             self.camera_init = self.camera_init_UI_3480LE
             self.camera_show = self.camera_show_UI_3480LE
@@ -391,8 +423,6 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     def closeEvent(self, event):
         # global c
-        self.camera.quit()
-        time.sleep(0.5)
         c.Release_Live()
         c.Terminate()
 

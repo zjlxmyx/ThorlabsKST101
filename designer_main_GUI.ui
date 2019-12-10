@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1800</width>
-    <height>900</height>
+    <width>1618</width>
+    <height>883</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <widget class="QPushButton" name="button_S">
     <property name="geometry">
      <rect>
-      <x>1570</x>
+      <x>1390</x>
       <y>160</y>
       <width>75</width>
       <height>75</height>
@@ -35,7 +35,7 @@
    <widget class="QPushButton" name="button_A">
     <property name="geometry">
      <rect>
-      <x>1470</x>
+      <x>1290</x>
       <y>250</y>
       <width>75</width>
       <height>75</height>
@@ -53,7 +53,7 @@
    <widget class="QPushButton" name="button_W">
     <property name="geometry">
      <rect>
-      <x>1570</x>
+      <x>1390</x>
       <y>250</y>
       <width>75</width>
       <height>75</height>
@@ -71,7 +71,7 @@
    <widget class="QPushButton" name="button_D">
     <property name="geometry">
      <rect>
-      <x>1670</x>
+      <x>1490</x>
       <y>250</y>
       <width>75</width>
       <height>75</height>
@@ -89,7 +89,7 @@
    <widget class="QPushButton" name="button_R">
     <property name="geometry">
      <rect>
-      <x>1630</x>
+      <x>1450</x>
       <y>450</y>
       <width>75</width>
       <height>75</height>
@@ -107,7 +107,7 @@
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>1470</x>
+      <x>1290</x>
       <y>340</y>
       <width>241</width>
       <height>51</height>
@@ -177,7 +177,7 @@
    <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
      <rect>
-      <x>1460</x>
+      <x>1280</x>
       <y>40</y>
       <width>111</width>
       <height>101</height>
@@ -244,7 +244,7 @@
    <widget class="QPushButton" name="button_MoveTo">
     <property name="geometry">
      <rect>
-      <x>1710</x>
+      <x>1530</x>
       <y>50</y>
       <width>75</width>
       <height>51</height>
@@ -262,7 +262,7 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>1580</x>
+      <x>1400</x>
       <y>49</y>
       <width>121</width>
       <height>91</height>
@@ -387,7 +387,7 @@
    <widget class="QPushButton" name="button_home">
     <property name="geometry">
      <rect>
-      <x>1710</x>
+      <x>1530</x>
       <y>110</y>
       <width>75</width>
       <height>31</height>
@@ -407,8 +407,8 @@
      <rect>
       <x>200</x>
       <y>40</y>
-      <width>1200</width>
-      <height>800</height>
+      <width>1056</width>
+      <height>704</height>
      </rect>
     </property>
     <property name="text">
@@ -421,7 +421,7 @@
    <widget class="QSlider" name="slider_XY">
     <property name="geometry">
      <rect>
-      <x>1470</x>
+      <x>1290</x>
       <y>400</y>
       <width>241</width>
       <height>22</height>
@@ -449,7 +449,7 @@
    <widget class="QGroupBox" name="groupBox_3">
     <property name="geometry">
      <rect>
-      <x>1510</x>
+      <x>1330</x>
       <y>450</y>
       <width>101</width>
       <height>141</height>
@@ -519,7 +519,7 @@
    <widget class="QPushButton" name="button_F">
     <property name="geometry">
      <rect>
-      <x>1630</x>
+      <x>1450</x>
       <y>550</y>
       <width>75</width>
       <height>75</height>
@@ -537,7 +537,7 @@
    <widget class="QLabel" name="label_XY_Verlosity">
     <property name="geometry">
      <rect>
-      <x>1716</x>
+      <x>1536</x>
       <y>360</y>
       <width>61</width>
       <height>41</height>
@@ -553,7 +553,7 @@
    <widget class="QLabel" name="label_Z_Verlosity">
     <property name="geometry">
      <rect>
-      <x>1530</x>
+      <x>1350</x>
       <y>590</y>
       <width>71</width>
       <height>31</height>
@@ -572,7 +572,7 @@
    <widget class="QSlider" name="slider_Z">
     <property name="geometry">
      <rect>
-      <x>1480</x>
+      <x>1300</x>
       <y>450</y>
       <width>22</width>
       <height>161</height>
@@ -600,8 +600,8 @@
    <widget class="QPushButton" name="button_camera">
     <property name="geometry">
      <rect>
-      <x>1470</x>
-      <y>760</y>
+      <x>1300</x>
+      <y>720</y>
       <width>71</width>
       <height>41</height>
      </rect>
@@ -616,8 +616,8 @@
    <widget class="QPushButton" name="button_capture">
     <property name="geometry">
      <rect>
-      <x>1550</x>
-      <y>760</y>
+      <x>1390</x>
+      <y>720</y>
       <width>71</width>
       <height>41</height>
      </rect>
@@ -866,18 +866,23 @@
      <string>Move</string>
     </property>
    </widget>
-   <widget class="QComboBox" name="comboBox">
+   <widget class="QComboBox" name="comboBox_cameraList">
     <property name="geometry">
      <rect>
-      <x>1470</x>
-      <y>660</y>
-      <width>151</width>
-      <height>22</height>
+      <x>1300</x>
+      <y>650</y>
+      <width>141</width>
+      <height>31</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
     </property>
     <item>
      <property name="text">
-      <string>select camera</string>
+      <string>select a camera</string>
      </property>
     </item>
     <item>
@@ -894,15 +899,181 @@
    <widget class="QLabel" name="label_savePath">
     <property name="geometry">
      <rect>
-      <x>1470</x>
+      <x>1300</x>
       <y>690</y>
       <width>301</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Z: &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;C:\Users\yanxin\Desktop&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
+   </widget>
+   <widget class="QLabel" name="label_cross">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>40</y>
+      <width>1056</width>
+      <height>704</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>../../Desktop/cross2.png</pixmap>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_scale_2dot5">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>40</y>
+      <width>1056</width>
+      <height>704</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>../../Desktop/2_5.png</pixmap>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_scale_10">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>40</y>
+      <width>1056</width>
+      <height>704</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>../../Desktop/10.png</pixmap>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_scale_20">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>40</y>
+      <width>1056</width>
+      <height>704</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>../../Desktop/20.png</pixmap>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_scale_50">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>40</y>
+      <width>1056</width>
+      <height>704</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>../../Desktop/50.png</pixmap>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_scale_100">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>40</y>
+      <width>1056</width>
+      <height>704</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>../../Desktop/100.png</pixmap>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="comboBox_scale">
+    <property name="geometry">
+     <rect>
+      <x>1150</x>
+      <y>760</y>
+      <width>111</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <item>
+     <property name="text">
+      <string>None</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>scale 2.5x</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>scale 10x</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>scale 20x</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>scale 50x</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>scale 100x</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="comboBox_centerCross">
+    <property name="geometry">
+     <rect>
+      <x>1020</x>
+      <y>760</y>
+      <width>111</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <item>
+     <property name="text">
+      <string>None</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>corss</string>
+     </property>
+    </item>
    </widget>
    <zorder>label_camera</zorder>
    <zorder>button_S</zorder>
@@ -934,15 +1105,23 @@
    <zorder>label_7</zorder>
    <zorder>label_6</zorder>
    <zorder>button_MoveTo_wafer</zorder>
-   <zorder>comboBox</zorder>
+   <zorder>comboBox_cameraList</zorder>
    <zorder>label_savePath</zorder>
+   <zorder>label_cross</zorder>
+   <zorder>label_scale_2dot5</zorder>
+   <zorder>label_scale_10</zorder>
+   <zorder>label_scale_20</zorder>
+   <zorder>label_scale_50</zorder>
+   <zorder>label_scale_100</zorder>
+   <zorder>comboBox_scale</zorder>
+   <zorder>comboBox_centerCross</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1800</width>
+     <width>1618</width>
      <height>23</height>
     </rect>
    </property>
