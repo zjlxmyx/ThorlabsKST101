@@ -9,15 +9,25 @@ from pyueye import ueye
 import extraLib
 import CanonLib
 from turbojpeg import TurboJPEG
+from threading import Timer
 jpeg = TurboJPEG("turbojpeg.dll")
+
+
+global isMoving
+global X_axis, Y_axis, Z_axis
+global liveImage
 
 
 class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     def __init__(self):
         super().__init__()
+
         self.setupUi(self)
+        self.label_camera.setScaledContents(True)
+
         self.hide_all_scale()
+        self.hide_all_center_marks()
         self.show()
 
         self.init_UIconnect()
@@ -25,8 +35,6 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.pos_X = 5000000
         self.pos_Y = 0
         self.pos_Z = 0
-
-
 
         self.leftup = None
         self.leftdown = None
@@ -37,16 +45,27 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.WTS = None
         self.waferCoordFlag = False
 
+        self.autoFocus_flag = False
+
+        self.autoFocus = AutoFocusThread()
+        self.autoFocus_Thread = QtCore.QThread()
+        self.autoFocus.moveToThread(self.autoFocus_Thread)
+        self.autoFocus_Thread.started.connect(self.autoFocus.work)
+
+
+
     def hide_all_scale(self):
-        self.label_cross.setVisible(False)
         self.label_scale_2dot5.setVisible(False)
         self.label_scale_10.setVisible(False)
         self.label_scale_20.setVisible(False)
         self.label_scale_50.setVisible(False)
         self.label_scale_100.setVisible(False)
 
+    def hide_all_center_marks(self):
+        self.label_cross.setVisible(False)
+
     def init_motor(self):
-        global X_axis, Y_axis, Z_axis
+
         X_axis = Motor('26000284')
         X_axis.connect()
 
@@ -121,8 +140,17 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.comboBox_centerCross.activated.connect(self.select_center_mark)
         self.comboBox_scale.activated.connect(self.select_scale)
 
+        self.button_autoFocus.clicked.connect(self.auto_focus)
+
     # function of showing position of motors
     def position_refresh(self):
+
+        isMoving = X_axis.is_moving() or Y_axis.is_moving() or Z_axis.is_moving()
+        if isMoving:
+            self.label_isMoving.setText("Motors are moving")
+        else:
+            self.label_isMoving.setText("Motors are stopped")
+
         self.pos_X = X_axis.get_position()
         self.label_x.setText(str(self.pos_X))
 
@@ -152,13 +180,19 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         time.sleep(0.1)
 
         # Multitasking for position from motors
-        self.PositionThread = PositionRefreshThread()
-        # Connecting the signal of new Thread to position refresh function
-        self.PositionThread.PositionSignal.connect(self.position_refresh)
-        self.PositionThread.start()
+        # self.PositionThread = PositionRefreshThread()
+        # # Connecting the signal of new Thread to position refresh function
+        # self.PositionThread.PositionSignal.connect(self.position_refresh)
+        # self.PositionThread.start()
         time.sleep(0.1)
 
-        self.statusBar().showMessage('Homing')
+        def on_timer():
+            while True:
+                time.sleep(0.2)
+                self.position_refresh()
+        t = Timer(0, on_timer)  # Quit after 5 seconds
+        t.start()
+
 
         X_axis.set_vel_params(500000, 30000000)
         Y_axis.set_vel_params(500000, 30000000)
@@ -181,8 +215,6 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         X_axis.set_vel_params(500000, 15000000)
         Y_axis.set_vel_params(500000, 15000000)
         Z_axis.set_vel_params(500000, 15000000)
-
-        self.statusBar().showMessage('')
 
 
     def set_velosity_xy(self):
@@ -328,7 +360,7 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         Y_axis.move_to_position(stagePosition[1])
 
     def select_center_mark(self):
-        self.hide_all_scale()
+        self.hide_all_center_marks()
         if self.comboBox_centerCross.currentIndex() == 1:
             self.label_cross.setVisible(True)
 
@@ -349,9 +381,15 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     def select_camera(self):
         if self.comboBox_cameraList.currentIndex() == 1:
-            global c
-            c = CanonLib.CanonCamera()
-            self.camera = CameraThread_Canon_EOS_600D()
+
+            self.CanonCamera = CameraThread_Canon_EOS_600D()
+            self.camera_Thread = QtCore.QThread()
+            self.CanonCamera.moveToThread(self.camera_Thread)
+            self.camera_Thread.started.connect(self.CanonCamera.work)
+            self.CanonCamera.stop_signal.connect(self.stop_camera_Thread)
+            self.CanonCamera.restart_signal.connect(self.LiveView_restart)
+
+
             self.camera_init = self.camera_init_Canon
             self.camera_show = self.camera_show_Canon
             self.capture = self.capture_Canon
@@ -364,30 +402,48 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.button_camera.clicked.connect(self.camera_init)
         self.button_capture.clicked.connect(self.capture)
 
+    def stop_camera_Thread(self):
+        self.camera_Thread.quit()
+        self.camera_Thread.wait()
+
+    def auto_focus(self):
+        print(self.camera_Thread.isFinished())
+
     # ------------------------------camera for Canon_EOS_600D ----------------------------------
     def camera_init_Canon(self):
+
         if self.button_camera.isChecked():
             self.button_camera.setText('Camera ON')
-            self.camera.CameraSignal.connect(self.camera_show)
-            self.camera.flag = True
-            self.camera.start()
+            self.CanonCamera.CameraSignal.connect(self.camera_show)
+            # self.CanonCamera.liveView_flag = True
+            self.camera_Thread.start()
         else:
             self.button_camera.setText('Camera')
-            self.camera.flag = False
+            self.CanonCamera.liveView_flag = False
+            # self.sin.emit()
 
     def camera_show_Canon(self, image):
-        frame = jpeg.decode(image)
+        liveImage = jpeg.decode(image)
+        frame = liveImage
         Qimg = QtGui.QImage(frame.data, frame.shape[1], frame.shape[0], QtGui.QImage.Format_RGB888)
         Qimg = Qimg.rgbSwapped()
         pixmap = QtGui.QPixmap.fromImage(Qimg)
         self.label_camera.setPixmap(pixmap)
 
+
+
+
     def capture_Canon(self):
-        self.camera.flag = False
-        c.set_Capture_ready()
-        c.get_Capture_image()
-        self.camera.flag = True
-        self.camera.start()
+        self.CanonCamera.capture_flag = True
+        self.CanonCamera.liveView_flag = False
+
+    def LiveView_restart(self):
+        print("camera Thread finished = ", self.camera_Thread.isFinished())
+        self.camera_Thread.quit()
+        self.camera_Thread.wait()
+        print("camera Thread finished = ", self.camera_Thread.isFinished())
+
+        self.camera_Thread.start()
 
     # ------------------------------camera for UI_3480LE_M_GL ----------------------------------
     def camera_init_UI_3480LE(self):
@@ -422,26 +478,25 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
 
     def closeEvent(self, event):
-        # global c
-        c.Release_Live()
-        c.Terminate()
+        self.CanonCamera.cameraObject.Terminate()
+        self.camera_Thread.quit()
 
 # create the Thread Class ---------------------------------------------------------------------------
-class PositionRefreshThread(QtCore.QThread):
-    # define a new Signal without value
-    PositionSignal = QtCore.pyqtSignal()
+# class PositionRefreshThread(QtCore.QThread):
+#     # define a new Signal without value
+#     PositionSignal = QtCore.pyqtSignal()
+#
+#     def __init__(self):
+#         super().__init__()
+#
+#     # emit the signal every 0.2s
+#     def run(self):
+#         while True:
+#             time.sleep(0.2)
+#             self.PositionSignal.emit()
 
-    def __init__(self):
-        super().__init__()
 
-    # emit the signal every 0.2s
-    def run(self):
-        while True:
-            time.sleep(0.2)
-            self.PositionSignal.emit()
-
-
-class CameraThread_UI_3480LE_M_GL(QtCore.QThread):
+class CameraThread_UI_3480LE_M_GL(QtCore.QObject):
     CameraSignal = QtCore.pyqtSignal(np.ndarray)
 
     def __init__(self):
@@ -503,28 +558,47 @@ class CameraThread_UI_3480LE_M_GL(QtCore.QThread):
         ueye.is_ExitCamera(self.hCam)
 
 
-class CameraThread_Canon_EOS_600D(QtCore.QThread):
+class CameraThread_Canon_EOS_600D(QtCore.QObject):
     CameraSignal = QtCore.pyqtSignal(np.ndarray)
+    restart_signal = QtCore.pyqtSignal()
+    stop_signal = QtCore.pyqtSignal()
 
-    def __init__(self):
-        super().__init__()
-        self.camera = None
+    # def __init__(self):
+    #     super().__init__()
+
+    def work(self):
         self.data = None
-        self.flag = None
-        c.Init_Camera()
-
-
-    def run(self):
-        self.camera = c
-        self.camera.set_LiveView_ready()
+        self.liveView_flag = True
+        self.capture_flag = False
+        self.cameraObject = CanonLib.CanonCamera()
+        self.cameraObject.Init_Camera()
+        self.cameraObject.set_LiveView_ready()
         time.sleep(1)
-        while self.flag:
-            self.data = self.camera.get_Live_image()
+        while self.liveView_flag:
+            self.data = self.cameraObject.get_Live_image()
             if (self.data.size != 0) and (self.data[0] != 0):
                 self.CameraSignal.emit(self.data)
-                time.sleep(0.1)
-        self.camera.Release_Live()
-        # self.camera.Terminate()
+                time.sleep(0.05)
+        self.cameraObject.Release_Live()
+        self.cameraObject.Terminate()
+        time.sleep(0.5)
+        if self.capture_flag:
+            self.capture_flag = False
+            self.cameraObject.Init_Camera()
+            self.cameraObject.set_Capture_ready()
+            self.cameraObject.get_Capture_image()
+            # time.sleep(2)
+            self.cameraObject.Terminate()
+
+            self.restart_signal.emit()
+        else:
+            self.stop_signal.emit()
+
+
+class AutoFocusThread(QtCore.QObject):
+
+    def work(self):
+        pass
 
 
 

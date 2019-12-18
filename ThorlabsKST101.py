@@ -165,9 +165,9 @@ class Motor:
     def is_moving(self):
         bits = ctypes.wintypes.DWORD(lib.SCC_GetStatusBits(self.SN))
         if ((bits.value >> 4) & 1) or ((bits.value >> 5) & 1):
-            return 1
+            return True
         else:
-            return 0
+            return False
 
 
 

@@ -6,6 +6,7 @@ import win32gui
 import win32api
 import win32con
 from threading import Timer
+import time
 
 os.environ['path'] += ';C:\\Users\\yanxin\\PycharmProjects\\canon_600D'
 EDSDK = ctypes.cdll.LoadLibrary('C:\\Users\\yanxin\PycharmProjects\\canon_600D\\EDSDK.dll')
@@ -87,7 +88,7 @@ class CanonCamera:
         err = EDSDK.EdsOpenSession(self.CameraRef)
         if err:
             print("open session failed with error code ", err)
-            return
+            # return
 
 
 
@@ -98,6 +99,7 @@ class CanonCamera:
         if err:
             print("set output device failed with error code ", err)
             return
+
         self.LiveStream = ctypes.c_void_p()
         self.evfImage = ctypes.c_void_p()
         err = EDSDK.EdsCreateMemoryStream(ctypes.c_ulonglong(0), ctypes.byref(self.LiveStream))
@@ -112,6 +114,8 @@ class CanonCamera:
 
     # get single Live image, should be in a loop
     def get_Live_image(self):
+
+
 
         Pointer = ctypes.pointer(ctypes.c_ubyte())
         imageLen = ctypes.c_ulonglong()
@@ -129,12 +133,18 @@ class CanonCamera:
         #     return jpeg.decode(imageData)
         return imageData
 
-    def set_Capture_ready(self):
-        err = EDSDK.EdsOpenSession(self.CameraRef)
-        if err:
-            print("open session failed with error code ", err)
-            # return
+    def Release_Live(self):
 
+        err = EDSDK.EdsRelease(self.LiveStream)
+        if err:
+            print("EdsRelease LiveStream failed with error code ", err)
+        err = EDSDK.EdsRelease(self.evfImage)
+        if err:
+            print("EdsRelease evfImage failed with error code ", err)
+        # self.stop_live_view()
+
+
+    def set_Capture_ready(self):
         kEdsObjectEvent_All = 0x00000200
         err = EDSDK.EdsSetObjectEventHandler(self.CameraRef, kEdsObjectEvent_All, ObjectHandler, None)
         if err:
@@ -143,6 +153,7 @@ class CanonCamera:
 
         kEdsPropID_SaveTo = 0x0000000b
         kEdsSaveTo_Host = ctypes.c_int(2)
+
         err = EDSDK.EdsSetPropertyData(self.CameraRef, kEdsPropID_SaveTo, 0, ctypes.sizeof(kEdsSaveTo_Host), ctypes.byref(kEdsSaveTo_Host))
         if err:
             print("Set SaveToHost failed with error code ", err)
@@ -157,11 +168,9 @@ class CanonCamera:
     def get_Capture_image(self):
 
         main_thread_id = win32api.GetCurrentThreadId()
-
         def on_timer():
             win32api.PostThreadMessage(main_thread_id, win32con.WM_QUIT, 0, 0)
-
-        t = Timer(5, on_timer)  # Quit after 5 seconds
+        t = Timer(3, on_timer)  # Quit after 1 seconds
         t.start()
         err = EDSDK.EdsSendCommand(self.CameraRef, 0, 0)
         if err:
@@ -170,9 +179,14 @@ class CanonCamera:
 
         win32gui.PumpMessages()
 
-    def Release_Live(self):
-        EDSDK.EdsRelease(self.LiveStream)
-        EDSDK.EdsRelease(self.evfImage)
+
+    def stop_live_view(self):
+        kEdsPropID_Evf_OutputDevice = 0x00000500
+        outPropertyData = ctypes.c_int(1)
+        err = EDSDK.EdsSetPropertyData(self.CameraRef, kEdsPropID_Evf_OutputDevice, 0, ctypes.sizeof(outPropertyData), ctypes.byref(outPropertyData))
+        if err:
+            print("set output device failed with error code ", err)
+
 
 
     def Terminate(self):

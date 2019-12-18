@@ -28,13 +28,13 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         Z_axis.connect()
         time.sleep(0.5)
         Z_axis.set_vel_params(100000, 1000000)
-        Z_axis.start_polling(200)
+        Z_axis.start_polling(50)
 
         def on_timer():
             while True:
-                time.sleep(0.2)
+                time.sleep(0.05)
                 self.position_refresh()
-        t = Timer(0, on_timer)  # Quit after 5 seconds
+        t = Timer(3, on_timer)  # Quit after 5 seconds
         t.start()
 
         self.pushButton_up.pressed.connect(lambda: Z_axis.move_at_velocity(1))
@@ -61,6 +61,7 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.autoFocus.moveToThread(self.autoFocus_Thread)
         self.autoFocus_Thread.started.connect(self.autoFocus.work)
         self.pushButton_autoFocus.clicked.connect(self.autoFocus_Thread.start)
+        self.autoFocus.stop_signal.connect(self.autoFocus_Thread.quit)
 
 
     def stop_camera_Thread(self):
@@ -68,9 +69,9 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
 
     def position_refresh(self):
-        global pos_Z
-        pos_Z = Z_axis.get_position()
-        self.statusbar().showMessage(str(pos_Z))
+        global Z_axis
+        self.label_position.setText(str(Z_axis.get_position()))
+
 
 
     def init_UI(self):
@@ -100,9 +101,11 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
 
     def camera_show(self, image):
+        global liveImage, pos_Z, Z_axis
         frame = jpeg.decode(image)
         liveImage = frame
-        frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
+        pos_Z = Z_axis.get_position()
+        # frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
         Qimg = QtGui.QImage(frame.data, frame.shape[1], frame.shape[0], QtGui.QImage.Format_RGB888)
         Qimg = Qimg.rgbSwapped()
         pixmap = QtGui.QPixmap.fromImage(Qimg)
@@ -116,7 +119,7 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         Qimg = QtGui.QImage(grad.data, grad.shape[1], grad.shape[0], QtGui.QImage.Format_Grayscale8)
         pixmap = QtGui.QPixmap.fromImage(Qimg)
         self.label_image_show_2.setPixmap(pixmap)
-        print(grad.var())
+        self.label_score.setText(str(grad.var()))
 
 
     def closeEvent(self, event):
@@ -150,23 +153,36 @@ class CameraThread(QtCore.QObject):
 
 
 class AutoFocusThread(QtCore.QObject):
+    stop_signal = QtCore.pyqtSignal()
 
     def work(self):
-        self.maxScore = 0
-        self.maxPosition = None
         global Z_axis, pos_Z, liveImage
-        pos_now = Z_axis.get_position()
-        Z_axis.move_to_position(pos_now-30000)
-        while Z_axis.is_moving():
-            time.sleep(0.5)
-        Z_axis.move_to_position(pos_now+30000)
-        while Z_axis.is_moving():
-            p = pos_Z
-            score = extraLib.get_Sharpness_score(liveImage)
-            if score > self.maxScore:
-                self.maxPosition = p
-                self.maxScore = score
+        self.maxScore = 0
+        self.maxPosition = pos_Z
+
+        self.pos_now = pos_Z
+        Z_axis.set_vel_params(100000, 1000000)
+        Z_axis.move_at_velocity(2)
+        while pos_Z > self.pos_now-20000:
+            time.sleep(0.2)
+        Z_axis.stop_profiled()
+        Z_axis.set_vel_params(100000, 100000)
+        self.s = np.array([[0., 0., 0.]])
+        Z_axis.move_to_position(self.pos_now+20000)
+        while pos_Z != self.pos_now+20000:
+            self.p = pos_Z
+            self.image = liveImage
+            self.shap = extraLib.get_Sharpness_score(self.image)
+            self.score = self.shap.var()
+            self.b = np.array([[Z_axis.get_position(), self.p, self.score]])
+            self.s= np.r_[self.s, self.b]
+            if self.score > self.maxScore:
+                self.maxPosition = self.p
+                self.maxScore = self.score
+
+        Z_axis.set_vel_params(100000, 3000000)
         Z_axis.move_to_position(self.maxPosition)
+        self.stop_signal.emit()
 
 
 

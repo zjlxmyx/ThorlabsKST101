@@ -1,4 +1,5 @@
 import numpy as np
+import cv2
 
 
 def get_matrix(new_zero, new_x):
@@ -52,3 +53,10 @@ def get_new_pos(matrix, point):
     output = [int(r[0, 0]), int(r[1, 0])]
     return output
 
+
+def get_Sharpness_score(image):
+    grayImg = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    grad_x = cv2.Sobel(grayImg, -1, 1, 0, ksize=5)
+    grad_y = cv2.Sobel(grayImg, -1, 0, 1, ksize=5)
+    grad = cv2.addWeighted(grad_x, 0.5, grad_y, 0.5, 0)
+    return grad.var()
