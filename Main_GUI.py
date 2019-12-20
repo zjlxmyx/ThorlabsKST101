@@ -51,6 +51,7 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.autoFocus_Thread = QtCore.QThread()
         self.autoFocus.moveToThread(self.autoFocus_Thread)
         self.autoFocus_Thread.started.connect(self.autoFocus.work)
+        self.autoFocus.autoFocus_stop_signal.connect(self.autoFocusStop)
 
 
 
@@ -78,7 +79,7 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         time.sleep(0.1)
         X_axis.start_polling(200)
         Y_axis.start_polling(200)
-        Z_axis.start_polling(200)
+        Z_axis.start_polling(50)
 
     def init_UIconnect(self):
 
@@ -136,11 +137,12 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
         # comboBox to select camera
         self.comboBox_cameraList.activated.connect(self.select_camera)
-
         self.comboBox_centerCross.activated.connect(self.select_center_mark)
         self.comboBox_scale.activated.connect(self.select_scale)
 
         self.button_autoFocus.clicked.connect(self.auto_focus)
+
+        self.button_saveTo.clicked.connect(self.save_to)
 
     # function of showing position of motors
     def position_refresh(self):
@@ -407,7 +409,8 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.camera_Thread.wait()
 
     def auto_focus(self):
-        print(self.camera_Thread.isFinished())
+        self.autoFocus_flag = True
+        self.autoFocus_Thread.start()
 
     # ------------------------------camera for Canon_EOS_600D ----------------------------------
     def camera_init_Canon(self):
@@ -423,17 +426,22 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             # self.sin.emit()
 
     def camera_show_Canon(self, image):
-        liveImage = jpeg.decode(image)
-        frame = liveImage
+        global pos_Z, score, temp
+        frame = jpeg.decode(image)
         Qimg = QtGui.QImage(frame.data, frame.shape[1], frame.shape[0], QtGui.QImage.Format_RGB888)
         Qimg = Qimg.rgbSwapped()
         pixmap = QtGui.QPixmap.fromImage(Qimg)
         self.label_camera.setPixmap(pixmap)
 
+        if self.autoFocus_flag:
+            score = extraLib.get_Sharpness_score(frame)
+            pos_Z = temp
+
 
 
 
     def capture_Canon(self):
+
         self.CanonCamera.capture_flag = True
         self.CanonCamera.liveView_flag = False
 
@@ -474,6 +482,17 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     def capture_UI_3480LE(self):
         ueye.is_ImageFile(self.camera.hCam, ueye.IS_IMAGE_FILE_CMD_SAVE, self.camera.IMAGE_FILE_PARAMS, self.camera.k)
+
+
+    def save_to(self):
+        path = QtWidgets.QFileDialog.getExistingDirectory(self, "getExistingDirectory", "./")
+        self.label_savePath.setText(path)
+        self.CanonCamera.path = path
+
+    def autoFocusStop(self):
+        self.autoFocus_flag = False
+        self.autoFocus_Thread.quit()
+        self.autoFocus_Thread.wait()
 
 
 
@@ -567,18 +586,24 @@ class CameraThread_Canon_EOS_600D(QtCore.QObject):
     #     super().__init__()
 
     def work(self):
+        global temp, Z_axis
+        self.path = None
+        self.ImageName = None
         self.data = None
         self.liveView_flag = True
         self.capture_flag = False
         self.cameraObject = CanonLib.CanonCamera()
         self.cameraObject.Init_Camera()
         self.cameraObject.set_LiveView_ready()
-        time.sleep(1)
+        time.sleep(2)
+
         while self.liveView_flag:
+            temp = Z_axis.get_position()
             self.data = self.cameraObject.get_Live_image()
             if (self.data.size != 0) and (self.data[0] != 0):
                 self.CameraSignal.emit(self.data)
                 time.sleep(0.05)
+
         self.cameraObject.Release_Live()
         self.cameraObject.Terminate()
         time.sleep(0.5)
@@ -586,7 +611,7 @@ class CameraThread_Canon_EOS_600D(QtCore.QObject):
             self.capture_flag = False
             self.cameraObject.Init_Camera()
             self.cameraObject.set_Capture_ready()
-            self.cameraObject.get_Capture_image()
+            self.cameraObject.get_Capture_image(self.path, self.ImageName)
             # time.sleep(2)
             self.cameraObject.Terminate()
 
@@ -596,9 +621,35 @@ class CameraThread_Canon_EOS_600D(QtCore.QObject):
 
 
 class AutoFocusThread(QtCore.QObject):
+    autoFocus_stop_signal = QtCore.pyqtSignal()
 
     def work(self):
-        pass
+        global Z_axis, pos_Z, score
+        self.maxScore = 0
+        self.maxPosition = pos_Z
+        self.prange = 10000
+        self.pos_now = pos_Z
+        Z_axis.set_vel_params(100000, 1000000)
+        Z_axis.move_at_velocity(1)
+
+        while pos_Z < self.pos_now + self.prange:
+            time.sleep(0.2)
+        Z_axis.stop_profiled()
+        Z_axis.set_vel_params(100000, 300000)
+        # self.s = np.array([[0., 0.]])
+        Z_axis.move_at_velocity(2)
+
+        while pos_Z > self.pos_now - self.prange:
+            self.p = pos_Z
+            self.score = score
+            if self.score > self.maxScore:
+                self.maxPosition = self.p
+                self.maxScore = self.score
+            time.sleep(0.05)
+
+        Z_axis.set_vel_params(100000, 1000000)
+        Z_axis.move_to_position((self.maxPosition+500))
+        self.autoFocus_stop_signal.emit()
 
 
 

@@ -602,9 +602,14 @@
      <rect>
       <x>1300</x>
       <y>720</y>
-      <width>71</width>
+      <width>81</width>
       <height>41</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
     </property>
     <property name="text">
      <string>Live View</string>
@@ -616,11 +621,16 @@
    <widget class="QPushButton" name="button_capture">
     <property name="geometry">
      <rect>
-      <x>1390</x>
+      <x>1420</x>
       <y>720</y>
-      <width>71</width>
+      <width>81</width>
       <height>41</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
     </property>
     <property name="text">
      <string>Capture</string>
@@ -871,8 +881,8 @@
      <rect>
       <x>1300</x>
       <y>650</y>
-      <width>151</width>
-      <height>31</height>
+      <width>150</width>
+      <height>30</height>
      </rect>
     </property>
     <property name="font">
@@ -901,8 +911,8 @@
      <rect>
       <x>1300</x>
       <y>690</y>
-      <width>301</width>
-      <height>21</height>
+      <width>300</width>
+      <height>20</height>
      </rect>
     </property>
     <property name="text">
@@ -1099,14 +1109,32 @@
    <widget class="QPushButton" name="button_autoFocus">
     <property name="geometry">
      <rect>
-      <x>1480</x>
-      <y>650</y>
-      <width>121</width>
-      <height>31</height>
+      <x>1530</x>
+      <y>500</y>
+      <width>71</width>
+      <height>71</height>
      </rect>
     </property>
     <property name="text">
      <string>Auto Focus</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="button_saveTo">
+    <property name="geometry">
+     <rect>
+      <x>1490</x>
+      <y>650</y>
+      <width>71</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>save to</string>
     </property>
    </widget>
    <zorder>label_camera</zorder>
@@ -1151,6 +1179,7 @@
    <zorder>comboBox_centerCross</zorder>
    <zorder>label_isMoving</zorder>
    <zorder>button_autoFocus</zorder>
+   <zorder>button_saveTo</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

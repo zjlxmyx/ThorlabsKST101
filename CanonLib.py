@@ -12,6 +12,9 @@ os.environ['path'] += ';C:\\Users\\yanxin\\PycharmProjects\\canon_600D'
 EDSDK = ctypes.cdll.LoadLibrary('C:\\Users\\yanxin\PycharmProjects\\canon_600D\\EDSDK.dll')
 jpeg = TurboJPEG("turbojpeg.dll")
 
+global ImageFilename
+ImageFilename = None
+
 
 class EdsCapacity(ctypes.Structure):
     _fields_ = [("numberOfFreeClusters", ctypes.c_ulong),
@@ -33,11 +36,11 @@ ObjectHandlerType = ctypes.WINFUNCTYPE(ctypes.c_int, ctypes.c_int, ctypes.c_void
 kEdsObjectEvent_DirItemRequestTransfer = 0x00000208
 kEdsFileCreateDisposition_CreateAlways = 1
 kEdsAccess_Write = 2
-global ImageFilename
-ImageFilename = b'C:\\Users\\yanxin\\Desktop\\test.jpg'
+
 
 def ObjectHandler_py(event, object, context):
     global ImageFilename
+
     if event == kEdsObjectEvent_DirItemRequestTransfer:
         dirinfo = DirectoryItemInfo()
         Ref = ctypes.c_void_p(object)
@@ -165,7 +168,12 @@ class CanonCamera:
             print("Set capacity failed with error code ", err)
             return
 
-    def get_Capture_image(self):
+    def get_Capture_image(self, path, name):
+        if name is None:
+            name = time.strftime("%m%d%H%M%S", time.localtime())
+        full_path = self.path + "/" + name + ".jpg"
+        global ImageFilename
+        ImageFilename = bytes(full_path, encoding="utf8")
 
         main_thread_id = win32api.GetCurrentThreadId()
         def on_timer():
