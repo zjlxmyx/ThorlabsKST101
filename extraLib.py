@@ -19,7 +19,7 @@ def get_matrix(new_zero, new_x):
     R_matrix = np.array([[0, -1],
                          [1,  0]])
 
-    vector_tx = vector_t/norm  # new unit X vector with unit 1µm
+    vector_tx = 2670*(vector_t/norm)  # new unit X vector with unit 1µm
     vector_ty = R_matrix.dot(vector_tx)  # rotation to get unit Y vector
 
     # translation matrix for coordinate system
@@ -55,7 +55,8 @@ def get_new_pos(matrix, point):
 
 
 def get_Sharpness_score(image):
-    grayImg = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    grayImg = image[:, :, 2]
+    grayImg = cv2.GaussianBlur(grayImg, (15, 15), 0, 0)
     grad_x = cv2.Sobel(grayImg, -1, 1, 0, ksize=5)
     grad_y = cv2.Sobel(grayImg, -1, 0, 1, ksize=5)
     grad = cv2.addWeighted(grad_x, 0.5, grad_y, 0.5, 0)

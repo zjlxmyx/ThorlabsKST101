@@ -13,9 +13,7 @@ from threading import Timer
 jpeg = TurboJPEG("turbojpeg.dll")
 
 
-global isMoving
-global X_axis, Y_axis, Z_axis
-global liveImage
+global liveImage, X_axis, Y_axis, Z_axis
 
 
 class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
@@ -31,8 +29,8 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.show()
 
         self.init_UIconnect()
-        self.init_motor()
-        self.pos_X = 5000000
+        # self.init_motor()
+        self.pos_X = 0
         self.pos_Y = 0
         self.pos_Z = 0
 
@@ -66,7 +64,7 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.label_cross.setVisible(False)
 
     def init_motor(self):
-
+        global X_axis, Y_axis, Z_axis
         X_axis = Motor('26000284')
         X_axis.connect()
 
@@ -80,6 +78,15 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         X_axis.start_polling(200)
         Y_axis.start_polling(200)
         Z_axis.start_polling(50)
+
+        time.sleep(0.1)
+
+        def on_timer():
+            while True:
+                time.sleep(0.2)
+                self.position_refresh()
+        t = Timer(1, on_timer)
+        t.start()
 
     def init_UIconnect(self):
 
@@ -117,6 +124,9 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         # Button of Home
         self.button_home.clicked.connect(self.home)
 
+        # Button of init motor
+        self.button_init_motor.clicked.connect(self.init_motor)
+
         # Slider of Velocity
         self.slider_XY.valueChanged.connect(lambda: self.label_XY_Verlosity.setText(str(self.slider_XY.value())))
         self.slider_XY.sliderReleased.connect(self.set_velosity_xy)
@@ -147,11 +157,11 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     # function of showing position of motors
     def position_refresh(self):
 
-        isMoving = X_axis.is_moving() or Y_axis.is_moving() or Z_axis.is_moving()
-        if isMoving:
-            self.label_isMoving.setText("Motors are moving")
-        else:
-            self.label_isMoving.setText("Motors are stopped")
+        # isMoving = X_axis.is_moving() or Y_axis.is_moving() or Z_axis.is_moving()
+        # if isMoving:
+        #     self.label_isMoving.setText("Motors are moving")
+        # else:
+        #     self.label_isMoving.setText("Motors are stopped")
 
         self.pos_X = X_axis.get_position()
         self.label_x.setText(str(self.pos_X))
@@ -179,22 +189,6 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
             Z_axis.move_to_position(int(self.lineEdit_zMoveTo.text()))
 
     def home(self):
-        time.sleep(0.1)
-
-        # Multitasking for position from motors
-        # self.PositionThread = PositionRefreshThread()
-        # # Connecting the signal of new Thread to position refresh function
-        # self.PositionThread.PositionSignal.connect(self.position_refresh)
-        # self.PositionThread.start()
-        time.sleep(0.1)
-
-        def on_timer():
-            while True:
-                time.sleep(0.2)
-                self.position_refresh()
-        t = Timer(0, on_timer)  # Quit after 5 seconds
-        t.start()
-
 
         X_axis.set_vel_params(500000, 30000000)
         Y_axis.set_vel_params(500000, 30000000)
@@ -379,7 +373,36 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         elif self.comboBox_scale.currentIndex() == 5:
             self.label_scale_100.setVisible(True)
 
+    # ------------------------------save to ----------------------------------
 
+    def save_to(self):
+        def on_timer():
+            while True:
+                time.sleep(0.2)
+                self.label_camera.setText(time.strftime("%m%d%H%M%S", time.localtime()))
+        t = Timer(0, on_timer)  # Quit after 5 seconds
+        t.start()
+
+        path = QtWidgets.QFileDialog.getExistingDirectory()
+        print(path)
+        self.label_savePath.setText(path)
+        # self.CanonCamera.path = path
+
+    # ------------------------------auto focus ----------------------------------
+
+    def auto_focus(self):
+        self.autoFocus_flag = True
+        self.autoFocus_Thread.start()
+
+    def autoFocusStop(self):
+        self.autoFocus_flag = False
+        self.autoFocus_Thread.quit()
+        self.autoFocus_Thread.wait()
+
+
+
+
+    # ------------------------------camera task ----------------------------------
 
     def select_camera(self):
         if self.comboBox_cameraList.currentIndex() == 1:
@@ -408,11 +431,10 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.camera_Thread.quit()
         self.camera_Thread.wait()
 
-    def auto_focus(self):
-        self.autoFocus_flag = True
-        self.autoFocus_Thread.start()
+
 
     # ------------------------------camera for Canon_EOS_600D ----------------------------------
+
     def camera_init_Canon(self):
 
         if self.button_camera.isChecked():
@@ -433,9 +455,10 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         pixmap = QtGui.QPixmap.fromImage(Qimg)
         self.label_camera.setPixmap(pixmap)
 
+        pos_Z = temp
         if self.autoFocus_flag:
             score = extraLib.get_Sharpness_score(frame)
-            pos_Z = temp
+
 
 
 
@@ -484,35 +507,13 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         ueye.is_ImageFile(self.camera.hCam, ueye.IS_IMAGE_FILE_CMD_SAVE, self.camera.IMAGE_FILE_PARAMS, self.camera.k)
 
 
-    def save_to(self):
-        path = QtWidgets.QFileDialog.getExistingDirectory(self, "getExistingDirectory", "./")
-        self.label_savePath.setText(path)
-        self.CanonCamera.path = path
 
-    def autoFocusStop(self):
-        self.autoFocus_flag = False
-        self.autoFocus_Thread.quit()
-        self.autoFocus_Thread.wait()
 
 
 
     def closeEvent(self, event):
         self.CanonCamera.cameraObject.Terminate()
         self.camera_Thread.quit()
-
-# create the Thread Class ---------------------------------------------------------------------------
-# class PositionRefreshThread(QtCore.QThread):
-#     # define a new Signal without value
-#     PositionSignal = QtCore.pyqtSignal()
-#
-#     def __init__(self):
-#         super().__init__()
-#
-#     # emit the signal every 0.2s
-#     def run(self):
-#         while True:
-#             time.sleep(0.2)
-#             self.PositionSignal.emit()
 
 
 class CameraThread_UI_3480LE_M_GL(QtCore.QObject):
@@ -602,7 +603,7 @@ class CameraThread_Canon_EOS_600D(QtCore.QObject):
             self.data = self.cameraObject.get_Live_image()
             if (self.data.size != 0) and (self.data[0] != 0):
                 self.CameraSignal.emit(self.data)
-                time.sleep(0.05)
+            time.sleep(0.05)
 
         self.cameraObject.Release_Live()
         self.cameraObject.Terminate()
@@ -640,11 +641,9 @@ class AutoFocusThread(QtCore.QObject):
         Z_axis.move_at_velocity(2)
 
         while pos_Z > self.pos_now - self.prange:
-            self.p = pos_Z
-            self.score = score
-            if self.score > self.maxScore:
-                self.maxPosition = self.p
-                self.maxScore = self.score
+            if score > self.maxScore:
+                self.maxPosition = pos_Z
+                self.maxScore = score
             time.sleep(0.05)
 
         Z_axis.set_vel_params(100000, 1000000)
