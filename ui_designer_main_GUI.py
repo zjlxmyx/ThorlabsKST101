@@ -398,6 +398,12 @@ class Ui_MainWindow(object):
         font.setPointSize(12)
         self.button_init_motor.setFont(font)
         self.button_init_motor.setObjectName("button_init_motor")
+        self.button_Z825B = QtWidgets.QPushButton(self.centralwidget)
+        self.button_Z825B.setGeometry(QtCore.QRect(1500, 160, 101, 31))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        self.button_Z825B.setFont(font)
+        self.button_Z825B.setObjectName("button_Z825B")
         self.label_camera.raise_()
         self.button_S.raise_()
         self.button_A.raise_()
@@ -441,6 +447,7 @@ class Ui_MainWindow(object):
         self.button_autoFocus.raise_()
         self.button_saveTo.raise_()
         self.button_init_motor.raise_()
+        self.button_Z825B.raise_()
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1618, 23))
@@ -523,6 +530,7 @@ class Ui_MainWindow(object):
         self.button_autoFocus.setText(_translate("MainWindow", "Auto Focus"))
         self.button_saveTo.setText(_translate("MainWindow", "save to"))
         self.button_init_motor.setText(_translate("MainWindow", "Init"))
+        self.button_Z825B.setText(_translate("MainWindow", "Z825B"))
 
 
 if __name__ == "__main__":
