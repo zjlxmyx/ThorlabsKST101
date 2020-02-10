@@ -3,7 +3,8 @@ import os
 from ctypes import wintypes
 
 os.environ['path'] += ';C:\Program Files\Thorlabs\Kinesis'
-lib = ctypes.cdll.LoadLibrary('C:\Program Files\Thorlabs\Kinesis\Thorlabs.MotionControl.KCube.StepperMotor.dll')
+lib = ctypes.cdll.LoadLibrary(r'C:\Program Files\Thorlabs\Kinesis\Thorlabs.MotionControl.KCube.StepperMotor.dll')
+
 
 
 class Motor:

@@ -9,7 +9,10 @@ from threading import Timer
 import time
 
 os.environ['path'] += ';C:\\Users\\yanxin\\PycharmProjects\\canon_600D'
-EDSDK = ctypes.cdll.LoadLibrary('C:\\Users\\yanxin\PycharmProjects\\canon_600D\\EDSDK.dll')
+try:
+    EDSDK = ctypes.cdll.LoadLibrary('C:\\Users\\yanxin\PycharmProjects\\canon_600D\\EDSDK.dll')
+except:
+    EDSDK = ctypes.cdll.LoadLibrary(r'C:\Users\yanxin\Documents\GitHub\canon_600D\EDSDK.dll')
 jpeg = TurboJPEG("turbojpeg.dll")
 
 global ImageFilename

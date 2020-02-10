@@ -2,9 +2,10 @@ import sys
 import time
 import cv2
 import numpy as np
+import ctypes
 from ui_designer_main_GUI import Ui_MainWindow
 from PyQt5 import QtCore, QtGui, QtWidgets
-from ThorlabsKST101 import *
+import ThorlabsKST101 as KST
 from pyueye import ueye
 import extraLib
 import CanonLib
@@ -65,13 +66,14 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     def init_motor(self):
         global X_axis, Y_axis, Z_axis
-        X_axis = Motor('26000284')
+
+        X_axis = KST.Motor('26000284')
         X_axis.connect()
 
-        Y_axis = Motor('26000306')
+        Y_axis = KST.Motor('26000306')
         Y_axis.connect()
 
-        Z_axis = Motor('26000236')
+        Z_axis = KST.Motor('26000236')
         Z_axis.connect()
 
         time.sleep(0.1)
@@ -599,7 +601,11 @@ class CameraThread_Canon_EOS_600D(QtCore.QObject):
         time.sleep(2)
 
         while self.liveView_flag:
-            temp = Z_axis.get_position()
+            try:
+                temp = Z_axis.get_position()
+            except:
+                pass
+
             self.data = self.cameraObject.get_Live_image()
             if (self.data.size != 0) and (self.data[0] != 0):
                 self.CameraSignal.emit(self.data)
