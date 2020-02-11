@@ -6,6 +6,7 @@ import ctypes
 from ui_designer_main_GUI import Ui_MainWindow
 from PyQt5 import QtCore, QtGui, QtWidgets
 import ThorlabsKST101 as KST
+import ThorlabsKDC101 as KDC
 from pyueye import ueye
 import extraLib
 import CanonLib
@@ -34,6 +35,7 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.pos_X = 0
         self.pos_Y = 0
         self.pos_Z = 0
+        self.pos_alpha = 0
 
         self.leftup = None
         self.leftdown = None
@@ -65,21 +67,30 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.label_cross.setVisible(False)
 
     def init_motor(self):
-        global X_axis, Y_axis, Z_axis
+        self.statusBar().showMessage('Initializing...')
 
-        X_axis = KST.Motor('26000284')
+        global X_axis, Y_axis, Z_axis, alpha_axis, Z825B_axis
+
+        X_axis = KST.Motor('26000236')
         X_axis.connect()
 
-        Y_axis = KST.Motor('26000306')
+        Y_axis = KST.Motor('26002702')
         Y_axis.connect()
 
-        Z_axis = KST.Motor('26000236')
+        Z_axis = KST.Motor('26002711')
         Z_axis.connect()
+
+        alpha_axis = KDC.Motor('27255326')
+        alpha_axis.connect()
+
+        Z825B_axis = KDC.Motor('27255268')
+        Z825B_axis.connect()
 
         time.sleep(0.1)
         X_axis.start_polling(200)
         Y_axis.start_polling(200)
         Z_axis.start_polling(50)
+        alpha_axis.start_polling(200)
 
         time.sleep(0.1)
 
@@ -89,6 +100,8 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
                 self.position_refresh()
         t = Timer(1, on_timer)
         t.start()
+
+        self.statusBar().showMessage('')
 
     def init_UIconnect(self):
 
@@ -128,6 +141,9 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
         # Button of init motor
         self.button_init_motor.clicked.connect(self.init_motor)
+
+        # B82Z
+        self.button_Z825B.clicked.connect(self.Z825B_movement)
 
         # Slider of Velocity
         self.slider_XY.valueChanged.connect(lambda: self.label_XY_Verlosity.setText(str(self.slider_XY.value())))
@@ -174,6 +190,9 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.pos_Z = Z_axis.get_position()
         self.label_z.setText(str(self.pos_Z))
 
+        self.pos_alpha = alpha_axis.get_position()
+        self.label_alpha.setText(str(self.pos_alpha))
+
         if self.waferCoordFlag:
             waferPosition = extraLib.get_new_pos(self.STW, [self.pos_X, self.pos_Y])
             self.label_wafer_x.setText(str(waferPosition[0]))
@@ -200,10 +219,11 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         X_axis.home()
         Y_axis.home()
         Z_axis.home()
+        Z825B_axis.home()
 
 
         time.sleep(0.5)
-        while Y_axis.is_moving() or X_axis.is_moving():
+        while Y_axis.is_moving() or X_axis.is_moving() or Z_axis.is_moving():
             time.sleep(1)
         X_axis.move_to_position(3700000)
         Y_axis.move_to_position(3700000)
@@ -213,6 +233,13 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         X_axis.set_vel_params(500000, 15000000)
         Y_axis.set_vel_params(500000, 15000000)
         Z_axis.set_vel_params(500000, 15000000)
+
+
+    def Z825B_movement(self):
+        if Z825B_axis.get_position() == 0:
+            Z825B_axis.move_to_position(686080)
+        else:
+            Z825B_axis.move_to_position(0)
 
 
     def set_velosity_xy(self):
@@ -347,7 +374,7 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.button_RightDown.setText(text)
 
     def create_wafer_coordinate(self):
-        self.STW, self.WTS = extraLib.get_matrix(self.leftdown, self.rightdown)
+        self.STW, self.WTS = extraLib.get_matrix(self.leftdown[0:2], self.rightdown[0:2])
         self.waferCoordFlag = True
 
     def move_to_wafer(self):
@@ -466,6 +493,9 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
 
     def capture_Canon(self):
+        path = self.lineEdit_savePath.text()
+
+        self.CanonCamera.path = path
 
         self.CanonCamera.capture_flag = True
         self.CanonCamera.liveView_flag = False

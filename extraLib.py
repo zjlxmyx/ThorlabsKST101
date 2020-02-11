@@ -61,3 +61,53 @@ def get_Sharpness_score(image):
     grad_y = cv2.Sobel(grayImg, -1, 0, 1, ksize=5)
     grad = cv2.addWeighted(grad_x, 0.5, grad_y, 0.5, 0)
     return grad.var()
+
+def get_scan_pos(leftdown,rightdown,rightup,leftup): # position format: [x, y]  (it is 2 dimension)
+    x1 = max(leftdown[0], leftup[0])
+    x2 = min(rightdown[0], rightup[0])
+    y1 = max(leftdown[1], rightdown[1])
+    y2 = min(leftup[1], rightup[1])
+
+    x_array = np.arange((x1+155), (x2-155), 260, 'int')
+    y_array = np.arange((y1+115), (y2-115), 180, 'int')
+
+    return x_array, y_array
+
+def Estimate_z_pos(p, leftdown,rightdown,rightup,leftup):
+    # p: [x, y] position to estimated, 4 corners position format: [x, y, z]  (it is 3 dimension)
+    ratio_down = (p[0]-leftdown[0])/(rightdown[0]-leftdown[0])
+    y_e1 = ratio_down*(rightdown[1]-leftdown[1])+leftdown[1]
+    z_e1 = ratio_down*(rightdown[2]-leftdown[2])+leftdown[2]
+
+    ratio_up = (p[0]-leftup[0])/(rightup[0]-leftup[0])
+    y_e2 = ratio_up*(rightup[1]-leftup[1])+leftup[1]
+    z_e2 = ratio_up*(rightup[2]-leftup[2])+leftup[2]
+
+    z = ((p[1]-y_e1)/(y_e2-y_e1))*(z_e2-z_e1)+z_e1
+
+    return int(z)
+
+
+
+
+
+
+# a=[0,0]
+# b=[3819,0]
+# c=[3808,4089]
+# d=[-68,3904]
+# x,y = get_scan_pos(a,b,c,d)
+# p = len(x)*len(y)
+# print(x)
+# print(y)
+# print('there are ' + str(p) + ' photos should be captured')
+# print('it will takes ' + str(p*10/60) +' mins')
+#
+
+a=[0,0,3446390]
+b=[3819,0,3418884]
+c=[3808,4089,3490590]
+d=[-68,3904,3548622]
+
+re = Estimate_z_pos([1600, 1600], a,b,c,d)
+print(re)
