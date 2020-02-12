@@ -56,6 +56,13 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.autoFocus_Thread.started.connect(self.autoFocus.work)
         self.autoFocus.autoFocus_stop_signal.connect(self.autoFocusStop)
 
+        # scanning process thread
+        self.scanning = scanningThread()
+        self.scanning_Thread = QtCore.QThread()
+        self.scanning.moveToThread(self.scanning_Thread)
+        self.scanning_Thread.started.connect(self.scanning.work)
+        self.scanning.focus_signal.connect(self.autoFocus)
+        self.scanning.capture_signal.connect(self.capture)
 
 
     def hide_all_scale(self):
@@ -85,7 +92,7 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         alpha_axis = KDC.Motor('27255326')
         alpha_axis.connect()
 
-        Z825B_axis = KDC.Motor('27255268')
+        Z825B_axis = KDC.Motor('27255266')
         Z825B_axis.connect()
 
         time.sleep(0.1)
@@ -170,6 +177,7 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.comboBox_centerCross.activated.connect(self.select_center_mark)
         self.comboBox_scale.activated.connect(self.select_scale)
 
+        # auto focus button
         self.button_autoFocus.clicked.connect(self.auto_focus)
 
         self.button_saveTo.clicked.connect(self.save_to)
@@ -210,6 +218,9 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
         if self.checkBox_zMove.isChecked():
             Z_axis.move_to_position(int(self.lineEdit_zMoveTo.text()))
+
+        if self.checkBox_alphaMove.isChecked():
+            alpha_axis.move_to_position(int(self.lineEdit_alphaMoveTo.text()))
 
     def home(self):
 
@@ -488,6 +499,7 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
         pos_Z = temp
         if self.autoFocus_flag:
+            print(Z_axis.is_moving())
             score = extraLib.get_Sharpness_score(frame)
 
 
@@ -495,6 +507,9 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
 
     def capture_Canon(self):
+        global cameraState
+        cameraState = True  # busy = True, free = False
+
         path = self.lineEdit_savePath.text()
 
         self.CanonCamera.path = path
@@ -621,7 +636,7 @@ class CameraThread_Canon_EOS_600D(QtCore.QObject):
     #     super().__init__()
 
     def work(self):
-        global temp, Z_axis
+        global temp, Z_axis, cameraState
         self.path = None
         self.ImageName = None
         self.data = None
@@ -631,6 +646,7 @@ class CameraThread_Canon_EOS_600D(QtCore.QObject):
         self.cameraObject.Init_Camera()
         self.cameraObject.set_LiveView_ready()
         time.sleep(2)
+        cameraState = False
 
         while self.liveView_flag:
             try:
@@ -703,7 +719,7 @@ class scanningThread(QtCore.QObject):
 
 
     def work(self):
-        global X_axis, Y_axis, Z_axis
+        global X_axis, Y_axis, Z_axis, cameraState
 
         x_array, y_array = extraLib.get_scan_pos(self.leftdown[0:2], self.rightdown[0:2], self.rightup[0:2], self.leftup[0:2])
 
@@ -722,11 +738,11 @@ class scanningThread(QtCore.QObject):
                 time.sleep(0.5)
 
                 while Z_axis.is_moving():
-                    time.sleep(0.2)
+                    time.sleep(0.1)
 
-                self.capturing_flag = True
+                self.capturing_state = True
                 self.capture_signal.emit()
-                while self.capturing_flag:
+                while cameraState:
                     time.sleep(0.2)
 
 

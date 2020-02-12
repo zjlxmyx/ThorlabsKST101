@@ -11,6 +11,7 @@ class Motor:
 
     # SN is a string
     def __init__(self, SN):
+        self.SN_str = SN
         self.SN = ctypes.c_char_p(bytes(SN, 'utf-8'))
         self.Acce_c = ctypes.c_int(0)
         self.MaxV_c = ctypes.c_int(0)
@@ -31,7 +32,7 @@ class Motor:
         lib.TLI_BuildDeviceList()
         err = lib.SCC_Open(self.SN)
         if err:
-            print("open device failed with error code ", err)
+            print("open device failed with error code ", err, ', SN:', self.SN_str)
             return
 
     # Starts the internal polling loop which continuously requests position and status.

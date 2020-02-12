@@ -91,23 +91,27 @@ def Estimate_z_pos(p, leftdown,rightdown,rightup,leftup):
 
 
 
-
+#
 # a=[0,0]
-# b=[3819,0]
-# c=[3808,4089]
-# d=[-68,3904]
+# b=[3150675,0]
+# c=[3141600,3373425]
+# d=[-56100,3220800]
 # x,y = get_scan_pos(a,b,c,d)
 # p = len(x)*len(y)
 # print(x)
 # print(y)
 # print('there are ' + str(p) + ' photos should be captured')
-# print('it will takes ' + str(p*10/60) +' mins')
-#
+# print('it will takes ' + str(p*15/60) +' mins')
+
 
 a=[0,0,3446390]
-b=[3819,0,3418884]
-c=[3808,4089,3490590]
-d=[-68,3904,3548622]
+b=[3150675,0,3418884]
+c=[3141600,3373425,3490590]
+d=[-56100,3220800,3548622]
 
-re = Estimate_z_pos([1600, 1600], a,b,c,d)
-print(re)
+x_array, y_array = get_scan_pos(a[0:2], b[0:2], c[0:2], d[0:2])
+
+for x in x_array:
+    for y in y_array:
+       z = Estimate_z_pos([x, y], a, b, c, d)
+       print(x, y, z)
