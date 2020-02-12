@@ -48,6 +48,8 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
         self.autoFocus_flag = False
 
+        # auto focus thread
+
         self.autoFocus = AutoFocusThread()
         self.autoFocus_Thread = QtCore.QThread()
         self.autoFocus.moveToThread(self.autoFocus_Thread)
@@ -413,7 +415,7 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         t.start()
 
         path = QtWidgets.QFileDialog.getExistingDirectory()
-        print(path)
+
         self.label_savePath.setText(path)
         # self.CanonCamera.path = path
 
@@ -685,6 +687,49 @@ class AutoFocusThread(QtCore.QObject):
         Z_axis.set_vel_params(100000, 1000000)
         Z_axis.move_to_position((self.maxPosition+500))
         self.autoFocus_stop_signal.emit()
+
+
+class scanningThread(QtCore.QObject):
+    focus_signal = QtCore.pyqtSignal()
+    capture_signal = QtCore.pyqtSignal()
+
+    def __init__(self):
+        self.leftup = None
+        self.leftdown = None
+        self.rightup = None
+        self.rightdown = None
+
+        self.capturing_flag = False
+
+
+    def work(self):
+        global X_axis, Y_axis, Z_axis
+
+        x_array, y_array = extraLib.get_scan_pos(self.leftdown[0:2], self.rightdown[0:2], self.rightup[0:2], self.leftup[0:2])
+
+        for x in x_array:
+            X_axis.move_to_position(x)
+            for y in y_array:
+                Y_axis.move_to_position(y)
+
+                z = extraLib.Estimate_z_pos([x, y], self.leftdown, self.rightdown, self.rightup, self.leftup)
+                Z_axis.move_to_position(z)
+
+                while (X_axis.get_position() != x) and (Y_axis.get_position() != y and Z_axis.get_position() != z):
+                    time.sleep(0.4)
+
+                self.focus_signal.emit()
+                time.sleep(0.5)
+
+                while Z_axis.is_moving():
+                    time.sleep(0.2)
+
+                self.capturing_flag = True
+                self.capture_signal.emit()
+                while self.capturing_flag:
+                    time.sleep(0.2)
+
+
 
 
 
