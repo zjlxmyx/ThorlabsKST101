@@ -407,6 +407,12 @@ class Ui_MainWindow(object):
         self.lineEdit_savePath = QtWidgets.QLineEdit(self.centralwidget)
         self.lineEdit_savePath.setGeometry(QtCore.QRect(1300, 770, 311, 31))
         self.lineEdit_savePath.setObjectName("lineEdit_savePath")
+        self.button_scan = QtWidgets.QPushButton(self.centralwidget)
+        self.button_scan.setGeometry(QtCore.QRect(30, 440, 131, 61))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        self.button_scan.setFont(font)
+        self.button_scan.setObjectName("button_scan")
         self.label_camera.raise_()
         self.button_S.raise_()
         self.button_A.raise_()
@@ -452,6 +458,7 @@ class Ui_MainWindow(object):
         self.button_init_motor.raise_()
         self.button_Z825B.raise_()
         self.lineEdit_savePath.raise_()
+        self.button_scan.raise_()
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1618, 23))
@@ -535,6 +542,7 @@ class Ui_MainWindow(object):
         self.button_saveTo.setText(_translate("MainWindow", "save to"))
         self.button_init_motor.setText(_translate("MainWindow", "Init"))
         self.button_Z825B.setText(_translate("MainWindow", "Z825B"))
+        self.button_scan.setText(_translate("MainWindow", "scan"))
 
 
 if __name__ == "__main__":

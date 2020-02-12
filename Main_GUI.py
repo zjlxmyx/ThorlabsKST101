@@ -48,6 +48,8 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
         self.autoFocus_flag = False
 
+        self.capture = None
+
         # auto focus thread
 
         self.autoFocus = AutoFocusThread()
@@ -57,12 +59,12 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.autoFocus.autoFocus_stop_signal.connect(self.autoFocusStop)
 
         # scanning process thread
-        self.scanning = scanningThread()
+        self.scanning = ScanningThread()
         self.scanning_Thread = QtCore.QThread()
         self.scanning.moveToThread(self.scanning_Thread)
         self.scanning_Thread.started.connect(self.scanning.work)
-        self.scanning.focus_signal.connect(self.autoFocus)
-        self.scanning.capture_signal.connect(self.capture)
+        self.scanning.focus_signal.connect(self.auto_focus)
+
 
 
     def hide_all_scale(self):
@@ -181,6 +183,8 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.button_autoFocus.clicked.connect(self.auto_focus)
 
         self.button_saveTo.clicked.connect(self.save_to)
+
+        self.button_scan.clicked.connect(self.scanning)
 
     # function of showing position of motors
     def position_refresh(self):
@@ -440,6 +444,11 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.autoFocus_flag = False
         self.autoFocus_Thread.quit()
         self.autoFocus_Thread.wait()
+
+    # ------------------------------scanning process ----------------------------------
+    def scanning(self):
+        self.scanning.capture_signal.connect(self.capture)
+        self.scanning_Thread.start()
 
 
 
@@ -705,21 +714,27 @@ class AutoFocusThread(QtCore.QObject):
         self.autoFocus_stop_signal.emit()
 
 
-class scanningThread(QtCore.QObject):
+class ScanningThread(QtCore.QObject):
     focus_signal = QtCore.pyqtSignal()
     capture_signal = QtCore.pyqtSignal()
 
-    def __init__(self):
+    # def __init__(self):
+    #     self.leftup = None
+    #     self.leftdown = None
+    #     self.rightup = None
+    #     self.rightdown = None
+    #
+    #     self.capturing_flag = False
+
+    def work(self):
+        global X_axis, Y_axis, Z_axis, cameraState
+
         self.leftup = None
         self.leftdown = None
         self.rightup = None
         self.rightdown = None
 
         self.capturing_flag = False
-
-
-    def work(self):
-        global X_axis, Y_axis, Z_axis, cameraState
 
         x_array, y_array = extraLib.get_scan_pos(self.leftdown[0:2], self.rightdown[0:2], self.rightup[0:2], self.leftup[0:2])
 
