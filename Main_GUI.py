@@ -78,7 +78,7 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.label_cross.setVisible(False)
 
     def init_motor(self):
-        self.statusBar().showMessage('Initializing...')
+        self.statusbar.showMessage('Initializing...')
 
         global X_axis, Y_axis, Z_axis, alpha_axis, Z825B_axis
 
@@ -112,7 +112,7 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         t = Timer(1, on_timer)
         t.start()
 
-        self.statusBar().showMessage('')
+        self.statusbar.showMessage('')
 
     def init_UIconnect(self):
 
@@ -422,16 +422,18 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     # ------------------------------save to ----------------------------------
 
     def save_to(self):
-        def on_timer():
-            while True:
-                time.sleep(0.2)
-                self.label_camera.setText(time.strftime("%m%d%H%M%S", time.localtime()))
-        t = Timer(0, on_timer)  # Quit after 5 seconds
-        t.start()
+        pass
 
-        path = QtWidgets.QFileDialog.getExistingDirectory()
-
-        self.label_savePath.setText(path)
+        # def on_timer():
+        #     while True:
+        #         time.sleep(0.2)
+        #         self.label_camera.setText(time.strftime("%m%d%H%M%S", time.localtime()))
+        # t = Timer(0, on_timer)  # Quit after 5 seconds
+        # t.start()
+        #
+        # path = QtWidgets.QFileDialog.getExistingDirectory()
+        #
+        # self.label_savePath.setText(path)
         # self.CanonCamera.path = path
 
     # ------------------------------auto focus ----------------------------------
@@ -447,7 +449,13 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     # ------------------------------scanning process ----------------------------------
     def scanning(self):
-        self.scanning.capture_signal.connect(self.capture)
+        global LD, RD, RU, LU
+        LD = self.leftdown
+        RD = self.rightdown
+        RU = self.rightup
+        LU = self.leftup
+
+        self.scanning.capture_signal.connect(lambda: self.capture_Canon(True))
         self.scanning_Thread.start()
 
 
@@ -515,13 +523,17 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
 
 
-    def capture_Canon(self):
+    def capture_Canon(self, rename=False):
         global cameraState
         cameraState = True  # busy = True, free = False
 
         path = self.lineEdit_savePath.text()
 
         self.CanonCamera.path = path
+        if rename:
+            position = extraLib.get_new_pos(self.STW, [self.pos_X, self.pos_Y])
+            self.CanonCamera.ImageName = 'x'+str(position[0])+'_y'+str(position[1])
+
 
         self.CanonCamera.capture_flag = True
         self.CanonCamera.liveView_flag = False
@@ -691,7 +703,7 @@ class AutoFocusThread(QtCore.QObject):
         global Z_axis, pos_Z, score
         self.maxScore = 0
         self.maxPosition = pos_Z
-        self.prange = 10000
+        self.prange = 7000
         self.pos_now = pos_Z
         Z_axis.set_vel_params(100000, 1000000)
         Z_axis.move_at_velocity(1)
@@ -727,17 +739,17 @@ class ScanningThread(QtCore.QObject):
     #     self.capturing_flag = False
 
     def work(self):
-        global X_axis, Y_axis, Z_axis, cameraState
+        global X_axis, Y_axis, Z_axis, cameraState, LD, RD, RU, LU
 
-        self.leftup = None
-        self.leftdown = None
-        self.rightup = None
-        self.rightdown = None
+        self.leftup = LU
+        self.leftdown = LD
+        self.rightup = RU
+        self.rightdown = RD
 
         self.capturing_flag = False
 
         x_array, y_array = extraLib.get_scan_pos(self.leftdown[0:2], self.rightdown[0:2], self.rightup[0:2], self.leftup[0:2])
-
+        print('there are totally ' + str(len(x_array) * len(y_array)) + ' photos')
         for x in x_array:
             X_axis.move_to_position(x)
             for y in y_array:
@@ -753,9 +765,9 @@ class ScanningThread(QtCore.QObject):
                 time.sleep(0.5)
 
                 while Z_axis.is_moving():
-                    time.sleep(0.1)
+                    time.sleep(0.8)
 
-                self.capturing_state = True
+                cameraState = True
                 self.capture_signal.emit()
                 while cameraState:
                     time.sleep(0.2)

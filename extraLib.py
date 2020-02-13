@@ -71,7 +71,7 @@ def get_scan_pos(leftdown,rightdown,rightup,leftup): # position format: [x, y]  
     x_array = np.arange((x1+127875), (x2-127875), 214500, 'int')
     y_array = np.arange((y1+94875), (y2-94875), 148500, 'int')
 
-    return x_array, y_array
+    return x_array.tolist(), y_array.tolist()
 
 def Estimate_z_pos(p, leftdown,rightdown,rightup,leftup):
     # p: [x, y] position to estimated, 4 corners position format: [x, y, z]  (it is 3 dimension)
@@ -104,14 +104,14 @@ def Estimate_z_pos(p, leftdown,rightdown,rightup,leftup):
 # print('it will takes ' + str(p*15/60) +' mins')
 
 
-a=[0,0,3446390]
-b=[3150675,0,3418884]
-c=[3141600,3373425,3490590]
-d=[-56100,3220800,3548622]
-
-x_array, y_array = get_scan_pos(a[0:2], b[0:2], c[0:2], d[0:2])
-
-for x in x_array:
-    for y in y_array:
-       z = Estimate_z_pos([x, y], a, b, c, d)
-       print(x, y, z)
+# a=[0,0,3446390]
+# b=[3150675,0,3418884]
+# c=[3141600,3373425,3490590]
+# d=[-56100,3220800,3548622]
+#
+# x_array, y_array = get_scan_pos(a[0:2], b[0:2], c[0:2], d[0:2])
+#
+# for x in x_array:
+#     for y in y_array:
+#        z = Estimate_z_pos([x, y], a, b, c, d)
+#        print(x, y, z)

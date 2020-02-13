@@ -174,7 +174,7 @@ class CanonCamera:
     def get_Capture_image(self, path, name):
         if name is None:
             name = time.strftime("%m%d%H%M%S", time.localtime())
-        full_path = self.path + "/" + name + ".jpg"
+        full_path = path + "/" + name + ".jpg"
         global ImageFilename
         ImageFilename = bytes(full_path, encoding="utf8")
 
