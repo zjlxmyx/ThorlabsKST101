@@ -68,8 +68,8 @@ def get_scan_pos(leftdown,rightdown,rightup,leftup): # position format: [x, y]  
     y1 = max(leftdown[1], rightdown[1])
     y2 = min(leftup[1], rightup[1])
 
-    x_array = np.arange((x1+127875), (x2-127875), 214500, 'int')
-    y_array = np.arange((y1+94875), (y2-94875), 148500, 'int')
+    x_array = np.arange((x1+155), (x2-155), 250, 'int')
+    y_array = np.arange((y1+115), (y2-115), 170, 'int')
 
     return x_array.tolist(), y_array.tolist()
 

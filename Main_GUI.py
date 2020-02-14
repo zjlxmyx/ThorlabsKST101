@@ -15,7 +15,7 @@ from threading import Timer
 jpeg = TurboJPEG("turbojpeg.dll")
 
 
-global liveImage, X_axis, Y_axis, Z_axis
+global liveImage, X_axis, Y_axis, Z_axis, STW, WTS
 
 
 class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
@@ -41,9 +41,15 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.leftdown = None
         self.rightup = None
         self.rightdown = None
+        self.up = None
+        self.left = None
+        self.right = None
+        self.down = None
+        self.center = None
 
-        self.STW = None
-        self.WTS = None
+
+        # STW = None
+        # WTS = None
         self.waferCoordFlag = False
 
         self.autoFocus_flag = False
@@ -78,7 +84,7 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.label_cross.setVisible(False)
 
     def init_motor(self):
-        self.statusbar.showMessage('Initializing...')
+        # self.statusBar().show()
 
         global X_axis, Y_axis, Z_axis, alpha_axis, Z825B_axis
 
@@ -112,7 +118,7 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         t = Timer(1, on_timer)
         t.start()
 
-        self.statusbar.showMessage('')
+        self.statusbar.showMessage('init finished', 5000)
 
     def init_UIconnect(self):
 
@@ -208,7 +214,7 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.label_alpha.setText(str(self.pos_alpha))
 
         if self.waferCoordFlag:
-            waferPosition = extraLib.get_new_pos(self.STW, [self.pos_X, self.pos_Y])
+            waferPosition = extraLib.get_new_pos(STW, [self.pos_X, self.pos_Y])
             self.label_wafer_x.setText(str(waferPosition[0]))
             self.label_wafer_y.setText(str(waferPosition[1]))
 
@@ -312,11 +318,11 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
         # press A
         elif (event.key() == QtCore.Qt.Key_A) and (not event.isAutoRepeat()):
-            X_axis.move_at_velocity(1)
+            X_axis.move_at_velocity(2)
 
         # press D
         elif (event.key() == QtCore.Qt.Key_D) and (not event.isAutoRepeat()):
-            X_axis.move_at_velocity(2)
+            X_axis.move_at_velocity(1)
 
         # press R
         elif (event.key() == QtCore.Qt.Key_R) and (not event.isAutoRepeat()):
@@ -372,32 +378,90 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     # save and show position of corner on button ----------------------------------------------------
     def save_leftup(self):
         self.leftup = [self.pos_X, self.pos_Y, self.pos_Z]
-        text = "Left Up" + "\nx= " + str(self.pos_X) + " \ny= " + str(self.pos_Y)
+        text = "Left Up" + "\nx= " + str(self.pos_X) + " \ny= " + str(self.pos_Y) + " \nz= " + str(self.pos_Z)
         self.button_LeftUp.setText(text)
 
     def save_leftdown(self):
         self.leftdown = [self.pos_X, self.pos_Y, self.pos_Z]
-        text = "Left Down" + "\nx= " + str(self.pos_X) + " \ny= " + str(self.pos_Y)
+        text = "Left Down" + "\nx= " + str(self.pos_X) + " \ny= " + str(self.pos_Y) + " \nz= " + str(self.pos_Z)
         self.button_LeftDown.setText(text)
 
     def save_rightup(self):
         self.rightup = [self.pos_X, self.pos_Y, self.pos_Z]
-        text = "Right Up" + "\nx= " + str(self.pos_X) + " \ny= " + str(self.pos_Y)
+        text = "Right Up" + "\nx= " + str(self.pos_X) + " \ny= " + str(self.pos_Y) + " \nz= " + str(self.pos_Z)
         self.button_RightUp.setText(text)
 
     def save_rightdown(self):
         self.rightdown = [self.pos_X, self.pos_Y, self.pos_Z]
-        text = "Right Down" + "\nx= " + str(self.pos_X) + " \ny= " + str(self.pos_Y)
+        text = "Right Down" + "\nx= " + str(self.pos_X) + " \ny= " + str(self.pos_Y) + " \nz= " + str(self.pos_Z)
         self.button_RightDown.setText(text)
 
+    def save_up(self):
+        if self.button_Up.isChecked():
+            x = (self.leftup[0] + self.rightup[0]) / 2
+            y = (self.leftup[1] + self.rightup[1]) / 2
+            X_axis.move_to_position(x)
+            Y_axis.move_to_position(y)
+        else:
+            self.up = [self.pos_X, self.pos_Y, self.pos_Z]
+            text = "Up" + "\nx= " + str(self.pos_X) + " \ny= " + str(self.pos_Y) + " \nz= " + str(self.pos_Z)
+            self.button_Up.setText(text)
+
+    def save_left(self):
+        if self.button_Left.isChecked():
+            x = (self.leftup[0] + self.leftdown[0]) / 2
+            y = (self.leftup[1] + self.leftdown[1]) / 2
+            X_axis.move_to_position(x)
+            Y_axis.move_to_position(y)
+        else:
+            self.left = [self.pos_X, self.pos_Y, self.pos_Z]
+            text = "Left" + "\nx= " + str(self.pos_X) + " \ny= " + str(self.pos_Y) + " \nz= " + str(self.pos_Z)
+            self.button_Left.setText(text)
+
+    def save_right(self):
+        if self.button_Right.isChecked():
+            x = (self.rightup[0] + self.rightdown[0]) / 2
+            y = (self.rightup[1] + self.rightdown[1]) / 2
+            X_axis.move_to_position(x)
+            Y_axis.move_to_position(y)
+        else:
+            self.right = [self.pos_X, self.pos_Y, self.pos_Z]
+            text = "Right" + "\nx= " + str(self.pos_X) + " \ny= " + str(self.pos_Y) + " \nz= " + str(self.pos_Z)
+            self.button_Right.setText(text)
+
+    def save_down(self):
+        if self.button_Down.isChecked():
+            x = (self.leftdown[0] + self.rightdown[0]) / 2
+            y = (self.leftdown[1] + self.rightdown[1]) / 2
+            X_axis.move_to_position(x)
+            Y_axis.move_to_position(y)
+        else:
+            self.down = [self.pos_X, self.pos_Y, self.pos_Z]
+            text = "Down" + "\nx= " + str(self.pos_X) + " \ny= " + str(self.pos_Y) + " \nz= " + str(self.pos_Z)
+            self.button_Down.setText(text)
+
+    def save_center(self):
+        if self.button_Center.isChecked():
+            x = (self.leftdown[0] + self.rightup[0]) / 2
+            y = (self.leftdown[1] + self.rightup[1]) / 2
+            X_axis.move_to_position(x)
+            Y_axis.move_to_position(y)
+        else:
+            self.center = [self.pos_X, self.pos_Y, self.pos_Z]
+            text = "Center" + "\nx= " + str(self.pos_X) + " \ny= " + str(self.pos_Y) + " \nz= " + str(self.pos_Z)
+            self.button_Center.setText(text)
+
+
+
     def create_wafer_coordinate(self):
-        self.STW, self.WTS = extraLib.get_matrix(self.leftdown[0:2], self.rightdown[0:2])
+        global STW, WTS
+        STW, WTS = extraLib.get_matrix(self.leftdown[0:2], self.rightdown[0:2])
         self.waferCoordFlag = True
 
     def move_to_wafer(self):
         stageX = int(self.lineEdit_xMoveTo_wafer.text())
         stageY = int(self.lineEdit_yMoveTo_wafer.text())
-        stagePosition = extraLib.get_new_pos(self.WTS, [stageX, stageY])
+        stagePosition = extraLib.get_new_pos(WTS, [stageX, stageY])
         X_axis.move_to_position(stagePosition[0])
         Y_axis.move_to_position(stagePosition[1])
 
@@ -422,7 +486,8 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     # ------------------------------save to ----------------------------------
 
     def save_to(self):
-        pass
+        self.Scanningthread.switch = False
+
 
         # def on_timer():
         #     while True:
@@ -449,11 +514,16 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
     # ------------------------------scanning process ----------------------------------
     def scanning(self):
-        global LD, RD, RU, LU
+        global LD, RD, RU, LU, R, L, U, D, C
         LD = self.leftdown
         RD = self.rightdown
         RU = self.rightup
         LU = self.leftup
+        R = self.right
+        L = self.left
+        U = self.up
+        D = self.down
+        C = self.center
 
         self.scanning.capture_signal.connect(lambda: self.capture_Canon(True))
         self.scanning_Thread.start()
@@ -516,7 +586,7 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
         pos_Z = temp
         if self.autoFocus_flag:
-            print(Z_axis.is_moving())
+            # print(Z_axis.is_moving())
             score = extraLib.get_Sharpness_score(frame)
 
 
@@ -524,25 +594,25 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
 
     def capture_Canon(self, rename=False):
-        global cameraState
+        global cameraState, STW
         cameraState = True  # busy = True, free = False
 
         path = self.lineEdit_savePath.text()
 
         self.CanonCamera.path = path
         if rename:
-            position = extraLib.get_new_pos(self.STW, [self.pos_X, self.pos_Y])
+            position = extraLib.get_new_pos(STW, [self.pos_X, self.pos_Y])
             self.CanonCamera.ImageName = 'x'+str(position[0])+'_y'+str(position[1])
 
 
         self.CanonCamera.capture_flag = True
-        self.CanonCamera.liveView_flag = False
+        # self.CanonCamera.liveView_flag = False
 
     def LiveView_restart(self):
-        print("camera Thread finished = ", self.camera_Thread.isFinished())
+        # print("camera Thread finished = ", self.camera_Thread.isFinished())
         self.camera_Thread.quit()
         self.camera_Thread.wait()
-        print("camera Thread finished = ", self.camera_Thread.isFinished())
+        # print("camera Thread finished = ", self.camera_Thread.isFinished())
 
         self.camera_Thread.start()
 
@@ -672,28 +742,52 @@ class CameraThread_Canon_EOS_600D(QtCore.QObject):
         while self.liveView_flag:
             try:
                 temp = Z_axis.get_position()
+                self.data = self.cameraObject.get_Live_image()
+                if (self.data.size != 0) and (self.data[0] != 0):
+                    self.CameraSignal.emit(self.data)
             except:
                 pass
 
-            self.data = self.cameraObject.get_Live_image()
-            if (self.data.size != 0) and (self.data[0] != 0):
-                self.CameraSignal.emit(self.data)
             time.sleep(0.05)
+            if self.capture_flag:
+
+                self.capture_flag = False
+                # self.cameraObject.Init_Camera()
+                self.cameraObject.set_Capture_ready()
+                self.cameraObject.get_Capture_image(self.path, self.ImageName)
+                cameraState = False
 
         self.cameraObject.Release_Live()
         self.cameraObject.Terminate()
-        time.sleep(0.5)
-        if self.capture_flag:
-            self.capture_flag = False
-            self.cameraObject.Init_Camera()
-            self.cameraObject.set_Capture_ready()
-            self.cameraObject.get_Capture_image(self.path, self.ImageName)
-            # time.sleep(2)
-            self.cameraObject.Terminate()
+        self.stop_signal.emit()
 
-            self.restart_signal.emit()
-        else:
-            self.stop_signal.emit()
+
+        # while self.liveView_flag:
+        #     try:
+        #         temp = Z_axis.get_position()
+        #     except:
+        #         pass
+        #
+        #     self.data = self.cameraObject.get_Live_image()
+        #     if (self.data.size != 0) and (self.data[0] != 0):
+        #         self.CameraSignal.emit(self.data)
+        #     time.sleep(0.05)
+        #
+        #
+        # time.sleep(0.5)
+        # if self.capture_flag:
+        #     self.capture_flag = False
+        #     # self.cameraObject.Init_Camera()
+        #     self.cameraObject.set_Capture_ready()
+        #     self.cameraObject.get_Capture_image(self.path, self.ImageName)
+        #     # time.sleep(2)
+        #     self.cameraObject.Terminate()
+        #
+        #     self.restart_signal.emit()
+        # else:
+        #     self.cameraObject.Release_Live()
+        #     self.cameraObject.Terminate()
+        #     self.stop_signal.emit()
 
 
 class AutoFocusThread(QtCore.QObject):
@@ -703,15 +797,15 @@ class AutoFocusThread(QtCore.QObject):
         global Z_axis, pos_Z, score
         self.maxScore = 0
         self.maxPosition = pos_Z
-        self.prange = 7000
+        self.prange = 7500
         self.pos_now = pos_Z
-        Z_axis.set_vel_params(100000, 1000000)
+        Z_axis.set_vel_params(1000000, 1000000)
         Z_axis.move_at_velocity(1)
 
         while pos_Z < self.pos_now + self.prange:
             time.sleep(0.2)
         Z_axis.stop_profiled()
-        Z_axis.set_vel_params(100000, 300000)
+        Z_axis.set_vel_params(1000000, 500000)
         # self.s = np.array([[0., 0.]])
         Z_axis.move_at_velocity(2)
 
@@ -721,8 +815,10 @@ class AutoFocusThread(QtCore.QObject):
                 self.maxScore = score
             time.sleep(0.05)
 
-        Z_axis.set_vel_params(100000, 1000000)
-        Z_axis.move_to_position((self.maxPosition+500))
+        Z_axis.set_vel_params(1000000, 1000000)
+        Z_axis.move_to_position((self.maxPosition+900))
+        time.sleep(0.5)
+        # Z_axis.set_vel_params(A, V)
         self.autoFocus_stop_signal.emit()
 
 
@@ -739,38 +835,83 @@ class ScanningThread(QtCore.QObject):
     #     self.capturing_flag = False
 
     def work(self):
-        global X_axis, Y_axis, Z_axis, cameraState, LD, RD, RU, LU
-
-        self.leftup = LU
-        self.leftdown = LD
-        self.rightup = RU
-        self.rightdown = RD
-
         self.capturing_flag = False
 
-        x_array, y_array = extraLib.get_scan_pos(self.leftdown[0:2], self.rightdown[0:2], self.rightup[0:2], self.leftup[0:2])
-        print('there are totally ' + str(len(x_array) * len(y_array)) + ' photos')
-        for x in x_array:
-            X_axis.move_to_position(x)
-            for y in y_array:
-                Y_axis.move_to_position(y)
+        global X_axis, Y_axis, Z_axis, cameraState, LD, RD, RU, LU, STW, WTS
 
-                z = extraLib.Estimate_z_pos([x, y], self.leftdown, self.rightdown, self.rightup, self.leftup)
+        self.leftup = extraLib.get_new_pos(STW, LU[0:2])
+        self.leftdown = extraLib.get_new_pos(STW, LD[0:2])
+        self.rightup = extraLib.get_new_pos(STW, RU[0:2])
+        self.rightdown = extraLib.get_new_pos(STW, RD[0:2])
+
+        self.switch = True
+
+        x_array, y_array = extraLib.get_scan_pos(self.leftdown, self.rightdown, self.rightup, self.leftup)
+
+        p = [[], [], [], [], [], [], [], [], [], []]
+
+        p[1] = [x_array[0], y_array[0]]
+        p[2] = [(x_array[0]+x_array[-1])/2, y_array[0]]
+        p[3] = [x_array[-1], y_array[0]]
+        p[4] = [x_array[0], (y_array[0]+y_array[-1])/2]
+        p[5] = [(x_array[0]+x_array[-1])/2,(y_array[0]+y_array[-1])/2]
+        p[6] = [x_array[-1], (y_array[0]+y_array[-1])/2]
+        p[7] = [x_array[0], y_array[-1]]
+        p[8] = [(x_array[0]+x_array[-1])/2, y_array[-1]]
+        p[9] = [x_array[-1], y_array[-1]]
+
+        for num in range(1, 10):
+            w_x, w_y = extraLib.get_new_pos(WTS, p[num])
+            X_axis.move_to_position(w_x)
+            Y_axis.move_to_position(w_y)
+
+            while self.switch:
+                time.sleep(0.5)
+            p[num] = [X_axis.get_position(), Y_axis.get_position(), Z_axis.get_position()]
+            self.switch = True
+
+        total = len(x_array) * len(y_array)
+        print('there are totally ' + str(total) + ' photos')
+        count = 0
+        for y in y_array:
+
+            for x in x_array:
+
+                w_x, w_y = extraLib.get_new_pos(WTS, [x, y])
+
+                X_axis.move_to_position(w_x)
+                Y_axis.move_to_position(w_y)
+
+                if x < ((x_array[0]+x_array[-1])/2) and y < ((y_array[0]+y_array[-1])/2):
+                    z = extraLib.Estimate_z_pos([w_x, w_y], p[1], p[2], p[5], p[4])
+                elif x >= ((x_array[0]+x_array[-1])/2) and y < ((y_array[0]+y_array[-1])/2):
+                    z = extraLib.Estimate_z_pos([w_x, w_y], p[2], p[3], p[6], p[5])
+                elif x < ((x_array[0]+x_array[-1])/2) and y >= ((y_array[0]+y_array[-1])/2):
+                    z = extraLib.Estimate_z_pos([w_x, w_y], p[4], p[5], p[8], p[7])
+                elif x >= ((x_array[0]+x_array[-1])/2) and y >= ((y_array[0]+y_array[-1])/2):
+                    z = extraLib.Estimate_z_pos([w_x, w_y], p[5], p[6], p[9], p[8])
+
+                Z_axis.set_vel_params(100000, 8000000)
                 Z_axis.move_to_position(z)
+                print([w_x, w_y, z])
 
-                while (X_axis.get_position() != x) and (Y_axis.get_position() != y and Z_axis.get_position() != z):
+                while (X_axis.get_position() != w_x) or (Y_axis.get_position() != w_y) or (Z_axis.get_position() != z):
                     time.sleep(0.4)
 
+                print('focusing')
                 self.focus_signal.emit()
                 time.sleep(0.5)
 
                 while Z_axis.is_moving():
                     time.sleep(0.8)
 
+                print('capturing')
                 cameraState = True
                 self.capture_signal.emit()
                 while cameraState:
                     time.sleep(0.2)
+                count = count + 1
+                print(str(count) + '/' + str(total) + ' are completed')
 
 
 
