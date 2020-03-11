@@ -15,7 +15,7 @@ from threading import Timer
 jpeg = TurboJPEG("turbojpeg.dll")
 
 
-global liveImage, X_axis, Y_axis, Z_axis, STW, WTS
+global liveImage, X_axis, Y_axis, Z_axis, alpha_axis, Z825B_axis, STW, WTS, switch
 
 
 class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
@@ -36,6 +36,7 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.pos_Y = 0
         self.pos_Z = 0
         self.pos_alpha = 0
+        self.pos_Z825B =0
 
         self.leftup = None
         self.leftdown = None
@@ -112,11 +113,13 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         time.sleep(0.1)
 
         def on_timer():
-            while True:
+            global refresh_flag
+            refresh_flag = True
+            while refresh_flag:
                 time.sleep(0.2)
                 self.position_refresh()
-        t = Timer(1, on_timer)
-        t.start()
+        self.t = Timer(1, on_timer)
+        self.t.start()
 
         self.statusbar.showMessage('init finished', 5000)
 
@@ -149,6 +152,10 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.radioButton_fast_Z.clicked.connect(self.set_velosity_fast_Z)
         self.radioButton_normal_Z.clicked.connect(self.set_velosity_normal_Z)
         self.radioButton_slow_Z.clicked.connect(self.set_velosity_slow_Z)
+
+        self.radioButton_fast_Z825B.clicked.connect(self.set_velosity_fast_Z825B)
+        self.radioButton_normal_Z825B.clicked.connect(self.set_velosity_normal_Z825B)
+        self.radioButton_slow_Z825B.clicked.connect(self.set_velosity_slow_Z825B)
 
         # Button of Move to
         self.button_MoveTo.clicked.connect(self.move_to)
@@ -188,9 +195,9 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         # auto focus button
         self.button_autoFocus.clicked.connect(self.auto_focus)
 
-        self.button_saveTo.clicked.connect(self.save_to)
+        # self.button_saveTo.clicked.connect(self.save_to)
 
-        self.button_scan.clicked.connect(self.scanning)
+        self.button_scan.clicked.connect(self.scanning_start)
 
     # function of showing position of motors
     def position_refresh(self):
@@ -259,10 +266,11 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
 
     def Z825B_movement(self):
-        if Z825B_axis.get_position() == 0:
-            Z825B_axis.move_to_position(686080)
+        self.pos_Z825B = Z825B_axis.get_position()
+        if Z825B_axis.get_position() < 686080:
+            Z825B_axis.move_to_position(857600)
         else:
-            Z825B_axis.move_to_position(0)
+            Z825B_axis.move_to_position(self.pos_Z825B)
 
 
     def set_velosity_xy(self):
@@ -305,6 +313,21 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         Z_axis.set_vel_params(100000, 100000)
         self.slider_Z.setValue(100000)
         self.label_Z_Verlosity.setText('100000')
+
+    def set_velosity_fast_Z825B(self):
+        Z825B_axis.set_vel_params(100000, 8000000)
+        # self.slider_Z.setValue(8000000)
+        # self.label_Z_Verlosity.setText('8000000')
+
+    def set_velosity_normal_Z825B(self):
+        Z825B_axis.set_vel_params(100000, 1000000)
+        # self.slider_Z.setValue(1000000)
+        # self.label_Z_Verlosity.setText('1000000')
+
+    def set_velosity_slow_Z825B(self):
+        Z825B_axis.set_vel_params(100000, 100000)
+        # self.slider_Z.setValue(100000)
+        # self.label_Z_Verlosity.setText('100000')
 
     # Keyboard motors controller -------------------------------------------------------------------
     def keyPressEvent(self, event):
@@ -486,7 +509,11 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
     # ------------------------------save to ----------------------------------
 
     def save_to(self):
-        self.Scanningthread.switch = False
+        global switch
+        switch = False
+        self.button_scan.clicked.disconnect(self.save_to)
+        self.button_scan.clicked.connect(self.scanFinished)
+        self.button_scan.setText('stop')
 
 
         # def on_timer():
@@ -513,7 +540,7 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         self.autoFocus_Thread.wait()
 
     # ------------------------------scanning process ----------------------------------
-    def scanning(self):
+    def scanning_start(self):
         global LD, RD, RU, LU, R, L, U, D, C
         LD = self.leftdown
         RD = self.rightdown
@@ -526,8 +553,17 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
         C = self.center
 
         self.scanning.capture_signal.connect(lambda: self.capture_Canon(True))
+        self.scanning.finished_signal.connect(self.scanFinished)
         self.scanning_Thread.start()
+        self.button_scan.clicked.disconnect(self.scanning_start)
+        self.button_scan.clicked.connect(self.save_to)
+        self.button_scan.setText('start')
 
+    def scanFinished(self):
+        X_axis.stop_profiled()
+        Y_axis.stop_profiled()
+        Z_axis.stop_profiled()
+        self.scanning_Thread.quit()
 
 
 
@@ -652,8 +688,23 @@ class GUIMainWindow(Ui_MainWindow, QtWidgets.QMainWindow):
 
 
     def closeEvent(self, event):
-        self.CanonCamera.cameraObject.Terminate()
-        self.camera_Thread.quit()
+        try:
+            global refresh_flag
+            refresh_flag = False
+        except:
+            print('close clock failed')
+        try:
+            self.CanonCamera.cameraObject.Terminate()
+        except:
+            pass
+        try:
+            self.camera_Thread.quit()
+        except:
+            pass
+        try:
+            self.scanFinished()
+        except:
+            pass
 
 
 class CameraThread_UI_3480LE_M_GL(QtCore.QObject):
@@ -740,13 +791,12 @@ class CameraThread_Canon_EOS_600D(QtCore.QObject):
         cameraState = False
 
         while self.liveView_flag:
-            try:
-                temp = Z_axis.get_position()
-                self.data = self.cameraObject.get_Live_image()
-                if (self.data.size != 0) and (self.data[0] != 0):
-                    self.CameraSignal.emit(self.data)
-            except:
-                pass
+
+            temp = Z_axis.get_position()
+            self.data = self.cameraObject.get_Live_image()
+            if (self.data.size != 0) and (self.data[0] != 0):
+                self.CameraSignal.emit(self.data)
+
 
             time.sleep(0.05)
             if self.capture_flag:
@@ -797,27 +847,43 @@ class AutoFocusThread(QtCore.QObject):
         global Z_axis, pos_Z, score
         self.maxScore = 0
         self.maxPosition = pos_Z
-        self.prange = 7500
+        self.prange = 10000
         self.pos_now = pos_Z
-        Z_axis.set_vel_params(1000000, 1000000)
-        Z_axis.move_at_velocity(1)
+        self.Acce, self.MaxV = Z_axis.get_vel_params()
 
-        while pos_Z < self.pos_now + self.prange:
-            time.sleep(0.2)
-        Z_axis.stop_profiled()
-        Z_axis.set_vel_params(1000000, 500000)
-        # self.s = np.array([[0., 0.]])
-        Z_axis.move_at_velocity(2)
+        for t in range(3):
 
-        while pos_Z > self.pos_now - self.prange:
-            if score > self.maxScore:
-                self.maxPosition = pos_Z
-                self.maxScore = score
-            time.sleep(0.05)
+            Z_axis.set_vel_params(1000000, 1000000)
+            Z_axis.move_at_velocity(1)
 
-        Z_axis.set_vel_params(1000000, 1000000)
-        Z_axis.move_to_position((self.maxPosition+900))
+            while pos_Z < self.pos_now + self.prange:
+                time.sleep(0.2)
+            Z_axis.stop_profiled()
+            Z_axis.set_vel_params(1000000, 500000)
+            # self.s = np.array([[0., 0.]])
+            Z_axis.move_at_velocity(2)
+
+            while pos_Z > self.pos_now - self.prange:
+                if score > self.maxScore:
+                    self.maxPosition = pos_Z
+                    self.maxScore = score
+                time.sleep(0.05)
+
+            Z_axis.set_vel_params(1000000, 1000000)
+            realMaxPos = self.maxPosition+800
+            if (self.pos_now-7500) <= realMaxPos <= (self.pos_now+7500):
+                break
+            elif realMaxPos < (self.pos_now-7500):
+                self.pos_now = realMaxPos-5000
+            elif realMaxPos > (self.pos_now+7500):
+                self.pos_now = realMaxPos+5000
+
+        Z_axis.move_to_position(realMaxPos)
+
         time.sleep(0.5)
+        Z_axis.set_vel_params(self.Acce, self.MaxV)
+
+
         # Z_axis.set_vel_params(A, V)
         self.autoFocus_stop_signal.emit()
 
@@ -825,6 +891,7 @@ class AutoFocusThread(QtCore.QObject):
 class ScanningThread(QtCore.QObject):
     focus_signal = QtCore.pyqtSignal()
     capture_signal = QtCore.pyqtSignal()
+    finished_signal = QtCore.pyqtSignal()
 
     # def __init__(self):
     #     self.leftup = None
@@ -837,43 +904,41 @@ class ScanningThread(QtCore.QObject):
     def work(self):
         self.capturing_flag = False
 
-        global X_axis, Y_axis, Z_axis, cameraState, LD, RD, RU, LU, STW, WTS
+        global X_axis, Y_axis, Z_axis, cameraState, LD, RD, RU, LU, STW, WTS, switch
 
         self.leftup = extraLib.get_new_pos(STW, LU[0:2])
         self.leftdown = extraLib.get_new_pos(STW, LD[0:2])
         self.rightup = extraLib.get_new_pos(STW, RU[0:2])
         self.rightdown = extraLib.get_new_pos(STW, RD[0:2])
 
-        self.switch = True
+        switch = True
 
         x_array, y_array = extraLib.get_scan_pos(self.leftdown, self.rightdown, self.rightup, self.leftup)
 
-        p = [[], [], [], [], [], [], [], [], [], []]
 
-        p[1] = [x_array[0], y_array[0]]
-        p[2] = [(x_array[0]+x_array[-1])/2, y_array[0]]
-        p[3] = [x_array[-1], y_array[0]]
-        p[4] = [x_array[0], (y_array[0]+y_array[-1])/2]
-        p[5] = [(x_array[0]+x_array[-1])/2,(y_array[0]+y_array[-1])/2]
-        p[6] = [x_array[-1], (y_array[0]+y_array[-1])/2]
-        p[7] = [x_array[0], y_array[-1]]
-        p[8] = [(x_array[0]+x_array[-1])/2, y_array[-1]]
-        p[9] = [x_array[-1], y_array[-1]]
+        p = [x_array[0], y_array[0]]
+        print(p)
 
-        for num in range(1, 10):
-            w_x, w_y = extraLib.get_new_pos(WTS, p[num])
-            X_axis.move_to_position(w_x)
-            Y_axis.move_to_position(w_y)
+        w_x, w_y = extraLib.get_new_pos(WTS, p)
+        X_axis.move_to_position(w_x)
+        Y_axis.move_to_position(w_y)
 
-            while self.switch:
-                time.sleep(0.5)
-            p[num] = [X_axis.get_position(), Y_axis.get_position(), Z_axis.get_position()]
-            self.switch = True
+        while switch:
+            time.sleep(0.5)
+        p = [X_axis.get_position(), Y_axis.get_position(), Z_axis.get_position()]
+        print(p)
+
 
         total = len(x_array) * len(y_array)
         print('there are totally ' + str(total) + ' photos')
         count = 0
+
+        last_z = p[2]
         for y in y_array:
+
+            z = last_z
+            Z_axis.set_vel_params(100000, 8000000)
+            Z_axis.move_to_position(z)
 
             for x in x_array:
 
@@ -882,28 +947,26 @@ class ScanningThread(QtCore.QObject):
                 X_axis.move_to_position(w_x)
                 Y_axis.move_to_position(w_y)
 
-                if x < ((x_array[0]+x_array[-1])/2) and y < ((y_array[0]+y_array[-1])/2):
-                    z = extraLib.Estimate_z_pos([w_x, w_y], p[1], p[2], p[5], p[4])
-                elif x >= ((x_array[0]+x_array[-1])/2) and y < ((y_array[0]+y_array[-1])/2):
-                    z = extraLib.Estimate_z_pos([w_x, w_y], p[2], p[3], p[6], p[5])
-                elif x < ((x_array[0]+x_array[-1])/2) and y >= ((y_array[0]+y_array[-1])/2):
-                    z = extraLib.Estimate_z_pos([w_x, w_y], p[4], p[5], p[8], p[7])
-                elif x >= ((x_array[0]+x_array[-1])/2) and y >= ((y_array[0]+y_array[-1])/2):
-                    z = extraLib.Estimate_z_pos([w_x, w_y], p[5], p[6], p[9], p[8])
 
-                Z_axis.set_vel_params(100000, 8000000)
-                Z_axis.move_to_position(z)
                 print([w_x, w_y, z])
 
-                while (X_axis.get_position() != w_x) or (Y_axis.get_position() != w_y) or (Z_axis.get_position() != z):
+                while (X_axis.get_position() != w_x) or (Y_axis.get_position() != w_y):
                     time.sleep(0.4)
 
+                l = Z_axis.get_position()
                 print('focusing')
                 self.focus_signal.emit()
                 time.sleep(0.5)
 
                 while Z_axis.is_moving():
                     time.sleep(0.8)
+
+                realZ = Z_axis.get_position()
+
+                if x == x_array[0]:
+                    last_z = realZ
+
+                print('z= '+str(l)+', real pos is '+str(realZ)+', err = '+str(l-realZ))
 
                 print('capturing')
                 cameraState = True
@@ -913,7 +976,7 @@ class ScanningThread(QtCore.QObject):
                 count = count + 1
                 print(str(count) + '/' + str(total) + ' are completed')
 
-
+        self.finished_signal.emit()
 
 
 

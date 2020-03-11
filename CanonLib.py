@@ -120,8 +120,9 @@ class CanonCamera:
 
     # get single Live image, should be in a loop
     def get_Live_image(self):
-
-
+        err = EDSDK.EdsSendCommand(self.CameraRef, 1, ctypes.c_void_p(None))
+        if err:
+            print("Keep Device On failed with error code ", err)
 
         Pointer = ctypes.pointer(ctypes.c_ubyte())
         imageLen = ctypes.c_ulonglong()
